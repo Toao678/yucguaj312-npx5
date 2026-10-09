@@ -1,76 +1,42 @@
+<!-- 新建 HTML，可通过预览按钮查看效果 -->
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 v6 严格度量预测</title>
+<title>PC28 v9 锦标赛</title>
 <style>
 :root{
-  --bg:#f2f4f8;
-  --card:#ffffff;
-  --card-2:#f8fafc;
-  --border:#e3e8f0;
-  --border-strong:#d0d8e4;
-  --text:#1c2333;
-  --text-2:#4a5568;
-  --text-dim:#8b96a8;
-  --text-faint:#a8b1c1;
-  --accent:#3b82f6;
-  --accent-2:#8b5cf6;
-  --green:#10b981;
-  --green-bg:#d1fae5;
-  --red:#ef4444;
-  --red-bg:#fee2e2;
-  --yellow:#f59e0b;
-  --yellow-bg:#fef3c7;
-  --purple:#8b5cf6;
-  --purple-bg:#ede9fe;
-  --blue:#3b82f6;
-  --blue-bg:#dbeafe;
+  --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;--border:#e3e8f0;--border-strong:#d0d8e4;
+  --text:#1c2333;--text-2:#4a5568;--text-dim:#8b96a8;--text-faint:#a8b1c1;
+  --accent:#3b82f6;--accent-2:#8b5cf6;--green:#10b981;--green-bg:#d1fae5;
+  --red:#ef4444;--red-bg:#fee2e2;--yellow:#f59e0b;--yellow-bg:#fef3c7;
+  --purple:#8b5cf6;--purple-bg:#ede9fe;--blue:#3b82f6;--blue-bg:#dbeafe;
+  --gold:#f59e0b;--silver:#94a3b8;--bronze:#b45309;
   --shadow-sm:0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
   --shadow-md:0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
-  --shadow-lg:0 10px 30px rgba(15,23,42,0.10), 0 4px 8px rgba(15,23,42,0.05);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
 body{
-  padding:10px;
-  background:linear-gradient(180deg, #f7f9fc 0%, #eef2f8 100%);
-  background-attachment:fixed;
-  color:var(--text);
+  padding:10px;background:linear-gradient(180deg, #f7f9fc 0%, #eef2f8 100%);
+  background-attachment:fixed;color:var(--text);
   font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  font-size:13px;line-height:1.55;
-  min-height:100vh;padding-bottom:24px;
+  font-size:13px;line-height:1.55;min-height:100vh;padding-bottom:24px;
   -webkit-font-smoothing:antialiased;
 }
-.card{
-  background:var(--card);
-  border:1px solid var(--border);
-  border-radius:16px;
-  padding:14px;
-  margin-bottom:10px;
-  box-shadow:var(--shadow-md);
-}
-h1{
-  font-size:16px;margin:0 0 8px;
-  color:var(--text);
-  font-weight:800;letter-spacing:0.3px;
-  display:flex;align-items:center;gap:6px;
-}
-h1 .logo-dot{
-  display:inline-block;width:8px;height:8px;border-radius:50%;
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;
+  padding:14px;margin-bottom:10px;box-shadow:var(--shadow-md)}
+h1{font-size:16px;margin:0 0 8px;color:var(--text);font-weight:800;
+  letter-spacing:0.3px;display:flex;align-items:center;gap:6px}
+h1 .logo-dot{display:inline-block;width:8px;height:8px;border-radius:50%;
   background:linear-gradient(135deg, #3b82f6, #8b5cf6);
-  box-shadow:0 0 8px rgba(59,130,246,0.5);
-}
-h2{
-  font-size:13px;margin:0 0 10px;
-  color:var(--text);
-  border-bottom:1px solid var(--border);
-  padding-bottom:8px;
-  display:flex;justify-content:space-between;align-items:center;gap:6px;
-  font-weight:700;
-}
-h2 .h2-title{flex:1;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  box-shadow:0 0 8px rgba(59,130,246,0.5)}
+h2{font-size:13px;margin:0 0 10px;color:var(--text);
+  border-bottom:1px solid var(--border);padding-bottom:8px;
+  display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+h2 .h2-title{flex:1;font-size:13px;font-weight:700;color:var(--text);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 h2 .h2-title b{color:var(--accent);font-weight:800}
 h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:11px;margin-left:4px}
 .row{display:flex;justify-content:space-between;margin:5px 0;align-items:center}
@@ -81,198 +47,161 @@ th,td{padding:4px 2px;text-align:center;border-bottom:1px solid var(--border)}
 th{color:var(--text-dim);font-weight:600}
 .num{text-align:right;font-variant-numeric:tabular-nums}
 .hit{color:var(--green)}.miss{color:var(--red)}.empty{color:var(--text-dim)}
-.btn{
-  background:linear-gradient(135deg, #3b82f6, #2563eb);
-  color:#fff;border:none;border-radius:10px;
-  padding:9px 18px;font-size:13px;cursor:pointer;margin:2px;
-  font-weight:700;
-  box-shadow:0 2px 8px rgba(59,130,246,0.35);
-  transition:all .15s;
-}
-.btn:active{transform:scale(0.97);box-shadow:0 1px 4px rgba(59,130,246,0.5)}
-.btn-sm{padding:6px 14px;font-size:12px;border-radius:8px}
-.btn-outline{
-  background:#fff;
-  border:1.5px solid var(--border-strong);
-  color:var(--text-2);
-  box-shadow:var(--shadow-sm);
-}
-.btn-outline:active{background:var(--card-2)}
-.btn-copy{
-  background:linear-gradient(135deg, #8b5cf6, #7c3aed);
+.btn{background:linear-gradient(135deg, #3b82f6, #2563eb);color:#fff;border:none;
+  border-radius:10px;padding:9px 18px;font-size:13px;cursor:pointer;margin:2px;
+  font-weight:700;box-shadow:0 2px 8px rgba(59,130,246,0.35);transition:all .15s}
+.btn:active{transform:scale(0.97)}
+.btn-copy{background:linear-gradient(135deg, #8b5cf6, #7c3aed);
   padding:5px 14px;font-size:11px;border-radius:8px;
-  box-shadow:0 2px 8px rgba(139,92,246,0.35);
-  font-weight:700;
-}
-.btn-copy:active{transform:scale(0.96)}
-.btn-scratch{
-  background:linear-gradient(135deg, #06b6d4, #0891b2);
-  padding:5px 14px;font-size:11px;border-radius:8px;
-  color:#fff;border:none;cursor:pointer;flex-shrink:0;
-  font-weight:700;
-  box-shadow:0 2px 8px rgba(6,182,212,0.35);
-}
-.btn-scratch:active{transform:scale(0.96)}
+  box-shadow:0 2px 8px rgba(139,92,246,0.35);font-weight:700}
+.btn-scratch{background:linear-gradient(135deg, #06b6d4, #0891b2);
+  padding:5px 14px;font-size:11px;border-radius:8px;color:#fff;border:none;
+  cursor:pointer;flex-shrink:0;font-weight:700;box-shadow:0 2px 8px rgba(6,182,212,0.35)}
 .status{font-size:11px;color:var(--text-dim);margin-top:6px}
-.pulse{
-  display:inline-block;width:7px;height:7px;border-radius:50%;
-  background:var(--green);margin-right:6px;
-  box-shadow:0 0 0 0 rgba(16,185,129,0.6);
-  animation:p 1.8s infinite;
-}
-@keyframes p{
-  0%{box-shadow:0 0 0 0 rgba(16,185,129,0.6)}
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:var(--green);margin-right:6px;box-shadow:0 0 0 0 rgba(16,185,129,0.6);
+  animation:p 1.8s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(16,185,129,0.6)}
   50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}
-  100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}
-}
+  100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
 @keyframes copied{0%{transform:scale(1)}30%{transform:scale(1.15)}100%{transform:scale(1)}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .tab-bar{display:flex;gap:6px;margin-bottom:10px}
-.tab{
-  flex:1;padding:9px 6px;text-align:center;
-  background:#fff;
-  border:1.5px solid var(--border);
-  border-radius:12px;font-size:12px;cursor:pointer;
-  color:var(--text-2);font-weight:700;
-  transition:all .2s;
-  box-shadow:var(--shadow-sm);
-}
-.tab.active{
-  background:linear-gradient(135deg, #3b82f6, #2563eb);
-  color:#fff;border-color:transparent;
-  box-shadow:0 4px 12px rgba(59,130,246,0.4);
-}
+.tab{flex:1;padding:9px 6px;text-align:center;background:#fff;
+  border:1.5px solid var(--border);border-radius:12px;font-size:12px;cursor:pointer;
+  color:var(--text-2);font-weight:700;transition:all .2s;box-shadow:var(--shadow-sm)}
+.tab.active{background:linear-gradient(135deg, #3b82f6, #2563eb);
+  color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(59,130,246,0.4)}
 .tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .25s ease}
-.metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px}
-.metric-box{
-  background:linear-gradient(135deg, #f0f5ff 0%, #ede9fe 100%);
-  border:1px solid #e0e7ff;
-  border-radius:12px;padding:8px;
-  text-align:center;
-  box-shadow:var(--shadow-sm);
-}
+.metrics-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:11px}
+.metric-box{background:linear-gradient(135deg, #f0f5ff 0%, #ede9fe 100%);
+  border:1px solid #e0e7ff;border-radius:12px;padding:8px;text-align:center;
+  box-shadow:var(--shadow-sm)}
 .metric-box .mv{font-size:17px;font-weight:800;color:#4f46e5}
 .metric-box .ml{font-size:10px;color:var(--text-dim);margin-top:2px;font-weight:600}
-.k-badge{
-  display:inline-block;padding:3px 10px;border-radius:10px;
-  background:linear-gradient(135deg, #ede9fe, #dbeafe);
-  border:1px solid #c7d2fe;
-  color:#6d28d9;font-weight:800;font-size:11px;
-}
+.k-badge{display:inline-block;padding:3px 10px;border-radius:10px;
+  background:linear-gradient(135deg, #fef3c7, #fde68a);border:1px solid #fbbf24;
+  color:#92400e;font-weight:800;font-size:11px}
 .warn{color:var(--yellow)}
-.summary{
-  background:linear-gradient(135deg, #f8fafc, #f0f5ff);
-  border:1px solid var(--border);
-  border-radius:12px;padding:10px;margin-top:10px;
-  display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:8px;
-}
+.summary{background:linear-gradient(135deg, #f8fafc, #f0f5ff);
+  border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;
+  display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:8px}
 .summary .sv{font-size:17px;font-weight:800;color:var(--text)}
 .summary .sl{font-size:10px;color:var(--text-dim);margin-top:1px;font-weight:600}
-.cd-box{
-  background:linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
-  border:1px solid #e0e7ff;
-  border-radius:14px;padding:12px;margin-top:8px;text-align:center;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.8);
-}
-.cd-label{font-size:11px;color:var(--text-dim);margin-bottom:4px;letter-spacing:0.5px;font-weight:600}
-.cd-time{
-  font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;
-  color:#4f46e5;
-  letter-spacing:2px;line-height:1.1;
-  text-shadow:0 2px 8px rgba(79,70,229,0.15);
-}
-.cd-time.urgent{color:#ef4444;text-shadow:0 2px 8px rgba(239,68,68,0.2);animation:p .8s infinite}
-.cd-time.soon{color:#f59e0b;text-shadow:0 2px 8px rgba(245,158,11,0.2)}
+.cd-box{background:linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
+  border:1px solid #e0e7ff;border-radius:14px;padding:12px;margin-top:8px;
+  text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.8)}
+.cd-label{font-size:11px;color:var(--text-dim);margin-bottom:4px;
+  letter-spacing:0.5px;font-weight:600}
+.cd-time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;
+  color:#4f46e5;letter-spacing:2px;line-height:1.1;
+  text-shadow:0 2px 8px rgba(79,70,229,0.15)}
+.cd-time.urgent{color:#ef4444;animation:p .8s infinite}
+.cd-time.soon{color:#f59e0b}
 .cd-sub{font-size:10px;color:var(--text-dim);margin-top:6px;font-weight:500}
-.progress-wrap{
-  margin-top:10px;background:#e9edf4;
-  border-radius:10px;height:10px;overflow:hidden;
-  border:1px solid var(--border);
-  position:relative;
-  box-shadow:inset 0 1px 2px rgba(15,23,42,0.06);
-}
-.progress-bar{
-  height:100%;
-  background:linear-gradient(90deg, #3b82f6, #10b981);
-  transition:width .3s linear;
-  border-radius:10px;
-  box-shadow:0 0 8px rgba(59,130,246,0.5);
-}
-.progress-bar.soon{background:linear-gradient(90deg, #f59e0b, #fb923c);box-shadow:0 0 8px rgba(245,158,11,0.5)}
-.progress-bar.urgent{background:linear-gradient(90deg, #ef4444, #dc2626);box-shadow:0 0 8px rgba(239,68,68,0.6);animation:p .8s infinite}
-.progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);margin-top:4px;font-weight:600}
-.pred-line{
-  display:flex;justify-content:center;align-items:baseline;gap:20px;
-  padding:16px 6px;font-weight:800;
-  font-size:clamp(15px,4.6vw,20px);
-  letter-spacing:0.5px;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-}
+.progress-wrap{margin-top:10px;background:#e9edf4;border-radius:10px;height:10px;
+  overflow:hidden;border:1px solid var(--border);position:relative;
+  box-shadow:inset 0 1px 2px rgba(15,23,42,0.06)}
+.progress-bar{height:100%;background:linear-gradient(90deg, #3b82f6, #10b981);
+  transition:width .3s linear;border-radius:10px;box-shadow:0 0 8px rgba(59,130,246,0.5)}
+.progress-bar.soon{background:linear-gradient(90deg, #f59e0b, #fb923c)}
+.progress-bar.urgent{background:linear-gradient(90deg, #ef4444, #dc2626);animation:p .8s infinite}
+.progress-labels{display:flex;justify-content:space-between;font-size:10px;
+  color:var(--text-faint);margin-top:4px;font-weight:600}
+.pred-line{display:flex;justify-content:center;align-items:baseline;gap:20px;
+  padding:16px 6px;font-weight:800;font-size:clamp(15px,4.6vw,20px);
+  letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pred-line .item{display:inline-flex;align-items:baseline}
 .pred-line .lbl{font-weight:600;color:var(--text-dim);font-size:.8em;margin-right:4px}
 .pred-line .main-val{color:#059669}
 .pred-line .def-val{color:#d97706}
-.scratch-wrap{
-  position:relative;margin-top:8px;border-radius:16px;overflow:hidden;
+.scratch-wrap{position:relative;margin-top:8px;border-radius:16px;overflow:hidden;
   background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-  border:1px solid var(--border);
-  min-height:110px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.9);
-}
-.scratch-under{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;justify-content:center;align-items:center;
-  padding:14px 6px;
-}
-.num-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%}
-.num-box{
-  width:46px;height:46px;
-  background:#fff;
-  color:#1c2333;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;font-weight:900;
+  border:1px solid var(--border);min-height:110px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.9)}
+.scratch-under{position:absolute;inset:0;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;padding:14px 6px}
+.num-row{display:flex;align-items:center;justify-content:center;gap:4px;
+  flex-wrap:nowrap;width:100%}
+.num-box{width:46px;height:46px;background:#fff;color:#1c2333;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;
   border:1.5px solid var(--border);
   box-shadow:0 2px 6px rgba(15,23,42,0.06), inset 0 -2px 0 rgba(15,23,42,0.04);
-  flex-shrink:0;
-  font-family:-apple-system,"PingFang SC",sans-serif;
-}
+  flex-shrink:0;font-family:-apple-system,"PingFang SC",sans-serif}
 .op{font-size:16px;font-weight:800;color:var(--text-faint);padding:0 2px;flex-shrink:0}
-.sum-box{
-  width:50px;height:50px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:26px;font-weight:900;color:#fff;
+.sum-box{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:26px;font-weight:900;color:#fff;
   background:linear-gradient(135deg, #3b82f6, #2563eb);
-  box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
-  flex-shrink:0;
-  font-family:-apple-system,"PingFang SC",sans-serif;
-}
+  box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15);
+  flex-shrink:0;font-family:-apple-system,"PingFang SC",sans-serif}
 .sep{width:0;height:32px;border-left:2px dotted #cbd5e1;margin:0 8px;flex-shrink:0}
-.size-box{
-  width:46px;height:46px;border-radius:12px;
-  display:flex;align-items:center;justify-content:center;
-  font-size:23px;font-weight:900;color:#fff;
-  box-shadow:0 4px 12px rgba(15,23,42,0.15), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
-  flex-shrink:0;
-  font-family:-apple-system,"PingFang SC",sans-serif;
-}
-.size-big{background:linear-gradient(135deg, #ef4444, #dc2626);box-shadow:0 4px 12px rgba(239,68,68,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
-.size-small{background:linear-gradient(135deg, #3b82f6, #2563eb);box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
-.parity-odd{background:linear-gradient(135deg, #3b82f6, #2563eb);box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
-.parity-even{background:linear-gradient(135deg, #ef4444, #dc2626);box-shadow:0 4px 12px rgba(239,68,68,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
-#scratchCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;display:none;border-radius:16px}
+.size-box{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-size:23px;font-weight:900;color:#fff;
+  box-shadow:0 4px 12px rgba(15,23,42,0.15), inset 0 -2px 0 rgba(0,0,0,0.15);
+  flex-shrink:0;font-family:-apple-system,"PingFang SC",sans-serif}
+.size-big{background:linear-gradient(135deg, #ef4444, #dc2626)}
+.size-small{background:linear-gradient(135deg, #3b82f6, #2563eb)}
+.parity-odd{background:linear-gradient(135deg, #3b82f6, #2563eb)}
+.parity-even{background:linear-gradient(135deg, #ef4444, #dc2626)}
+#scratchCanvas{position:absolute;inset:0;width:100%;height:100%;
+  cursor:crosshair;touch-action:none;display:none;border-radius:16px}
 #scratchCanvas.active{display:block}
-.trend-wrap{max-height:520px;overflow-y:auto;border-radius:12px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+
+/* 锦标赛报告 */
+.tourney-report{
+  background:linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border:1px solid #fcd34d;border-radius:12px;padding:12px;margin-top:10px;
+  box-shadow:var(--shadow-sm)}
+.tourney-report .title{
+  font-size:12px;font-weight:800;color:#92400e;margin-bottom:8px;
+  letter-spacing:0.5px;display:flex;align-items:center;gap:4px}
+.tourney-section{margin-bottom:10px}
+.tourney-section:last-child{margin-bottom:0}
+.tourney-section .sec-title{
+  font-size:11px;font-weight:700;color:#78350f;margin-bottom:6px;
+  padding-bottom:3px;border-bottom:1px dashed #fcd34d}
+.rank-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 8px;background:#fff;border-radius:8px;margin-bottom:4px;
+  font-size:11px;font-weight:600;border:1px solid #fde68a;
+  box-shadow:0 1px 2px rgba(245,158,11,0.1)}
+.rank-row.champion{background:linear-gradient(90deg, #fef3c7, #fde68a);border-color:#f59e0b}
+.rank-row.runnerup{background:#fff;border-color:#cbd5e1}
+.rank-row.defense{background:#fef3c7;border-color:#fcd34d}
+.rank-medal{font-size:14px;margin-right:6px}
+.rank-name{flex:1;font-weight:800;font-size:12px}
+.rank-points{font-size:11px;color:#78350f;font-weight:700;
+  font-variant-numeric:tabular-nums}
+.battle-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:5px 8px;background:#fff;border-radius:8px;margin-bottom:4px;
+  font-size:11px;border:1px solid #e5e7eb}
+.battle-label{font-weight:700;color:#6b7280;min-width:50px}
+.battle-vs{flex:1;display:flex;justify-content:center;align-items:center;
+  gap:6px;font-variant-numeric:tabular-nums}
+.battle-score-win{color:#059669;font-weight:800}
+.battle-score-lose{color:#9ca3af;font-weight:600}
+.battle-win-name{color:#059669;font-weight:800}
+.battle-lose-name{color:#6b7280;font-weight:600}
+
+.trend-wrap{max-height:520px;overflow-y:auto;border-radius:12px;background:#fff;
+  border:1px solid var(--border);box-shadow:var(--shadow-sm)}
 .trend-table{width:100%;border-collapse:collapse;font-size:11px}
-.trend-table th{position:sticky;top:0;background:#f8fafc;color:var(--text-dim);padding:8px 1px;font-weight:700;z-index:2;font-size:10px;border-bottom:1.5px solid var(--border)}
-.trend-table td{padding:4px 1px;text-align:center;border-bottom:1px solid #f1f5f9;height:24px;vertical-align:middle}
+.trend-table th{position:sticky;top:0;background:#f8fafc;color:var(--text-dim);
+  padding:8px 1px;font-weight:700;z-index:2;font-size:10px;
+  border-bottom:1.5px solid var(--border)}
+.trend-table td{padding:4px 1px;text-align:center;
+  border-bottom:1px solid #f1f5f9;height:24px;vertical-align:middle}
 .trend-table tr.latest td{background:#eff6ff}
 .trend-table tr.latest .issue{color:var(--accent);font-weight:800}
 .trend-table tr.hidden td{color:var(--text-faint) !important;font-style:italic}
 .trend-table tr.hidden .tag{display:none}
-.trend-table tr.hidden .hidden-q{display:inline-block;color:var(--text-faint);font-weight:800;font-size:14px;letter-spacing:1px}
+.trend-table tr.hidden .hidden-q{display:inline-block;color:var(--text-faint);
+  font-weight:800;font-size:14px;letter-spacing:1px}
 .trend-table .issue{color:var(--text-dim);font-size:10px;font-weight:600}
 .trend-table .val{font-weight:800;font-variant-numeric:tabular-nums;color:var(--text)}
-.trend-table .tag{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;min-width:18px;line-height:16px;font-weight:800}
+.trend-table .tag{display:inline-block;padding:1px 6px;border-radius:5px;
+  font-size:10px;min-width:18px;line-height:16px;font-weight:800}
 .tag-big{background:var(--red-bg);color:#b91c1c}
 .tag-small{background:var(--blue-bg);color:#1d4ed8}
 .tag-odd{background:var(--blue-bg);color:#1d4ed8}
@@ -285,73 +214,46 @@ th{color:var(--text-dim);font-weight:600}
 .history-table{font-size:11px}
 .history-table th{padding:7px 1px;font-size:10px;color:var(--text-dim);font-weight:700}
 .history-table td{padding:5px 1px;font-size:10px}
-.history-table .issue-cell{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums;font-weight:600}
-.history-table .time-cell{font-size:10px;color:var(--text-dim);font-variant-numeric:tabular-nums}
-.history-table .nums-cell{font-size:10px;font-variant-numeric:tabular-nums;font-weight:800;color:var(--text)}
-.history-table .combo-cell{text-align:center}
-.history-table .pattern-cell{text-align:center}
-.pattern-tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:800}
+.history-table .issue-cell{font-size:10px;color:var(--text-2);
+  font-variant-numeric:tabular-nums;font-weight:600}
+.history-table .time-cell{font-size:10px;color:var(--text-dim);
+  font-variant-numeric:tabular-nums}
+.history-table .nums-cell{font-size:10px;font-variant-numeric:tabular-nums;
+  font-weight:800;color:var(--text)}
+.pattern-tag{display:inline-block;padding:2px 6px;border-radius:5px;
+  font-size:9px;font-weight:800}
 .pt-baozi{background:var(--purple-bg);color:#6d28d9}
 .pt-shunzi{background:#cffafe;color:#0e7490}
 .pt-duizi{background:var(--yellow-bg);color:#b45309}
 .pt-zaliu{background:#f1f5f9;color:#64748b}
-
-.combo-tag{
-  display:inline-block;padding:2px 8px;border-radius:6px;
-  font-size:10px;font-weight:800;letter-spacing:0.5px;
-  min-width:32px;
-}
+.combo-tag{display:inline-block;padding:2px 8px;border-radius:6px;
+  font-size:10px;font-weight:800;letter-spacing:0.5px;min-width:32px}
 .combo-dadian{background:#fee2e2;color:#b91c1c}
 .combo-dashuang{background:#fed7aa;color:#c2410c}
 .combo-xiaodian{background:#dbeafe;color:#1d4ed8}
 .combo-xiaoshuang{background:#cffafe;color:#0e7490}
 
-.pager{
-  display:flex;justify-content:center;align-items:center;gap:8px;
-  margin-top:12px;padding:8px;
-  background:linear-gradient(135deg, #f8fafc, #f0f5ff);
-  border:1px solid var(--border);
-  border-radius:10px;
-}
-.pager-btn{
-  background:#fff;
-  border:1.5px solid var(--border-strong);
-  color:var(--text-2);
-  border-radius:8px;
-  padding:6px 14px;
-  font-size:12px;
-  font-weight:700;
-  cursor:pointer;
-  transition:all .15s;
-  box-shadow:var(--shadow-sm);
-  min-width:64px;
-}
+.pager{display:flex;justify-content:center;align-items:center;gap:8px;
+  margin-top:12px;padding:8px;background:linear-gradient(135deg, #f8fafc, #f0f5ff);
+  border:1px solid var(--border);border-radius:10px}
+.pager-btn{background:#fff;border:1.5px solid var(--border-strong);
+  color:var(--text-2);border-radius:8px;padding:6px 14px;font-size:12px;
+  font-weight:700;cursor:pointer;transition:all .15s;box-shadow:var(--shadow-sm);
+  min-width:64px}
 .pager-btn:active{transform:scale(0.96);background:var(--card-2)}
 .pager-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
-.pager-info{
-  font-size:12px;
-  font-weight:700;
-  color:var(--text);
-  padding:0 8px;
-  font-variant-numeric:tabular-nums;
-  min-width:80px;
-  text-align:center;
-}
+.pager-info{font-size:12px;font-weight:700;color:var(--text);padding:0 8px;
+  font-variant-numeric:tabular-nums;min-width:80px;text-align:center}
 .pager-info .cur{color:var(--accent);font-weight:900;font-size:14px}
 .pager-info .total{color:var(--text-dim)}
-
-.pattern-stats{
-  background:linear-gradient(135deg, #f8fafc, #f0f5ff);
-  border:1px solid var(--border);
-  border-radius:12px;padding:12px;margin-top:10px;
-  display:flex;justify-content:space-around;text-align:center;
-  flex-wrap:wrap;gap:8px;
-  box-shadow:var(--shadow-sm);
-}
-.pattern-stat-item{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:50px}
+.pattern-stats{background:linear-gradient(135deg, #f8fafc, #f0f5ff);
+  border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px;
+  display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;
+  gap:8px;box-shadow:var(--shadow-sm)}
+.pattern-stat-item{display:flex;flex-direction:column;align-items:center;
+  gap:4px;min-width:50px}
 .pattern-stat-val{font-size:18px;font-weight:900;color:var(--text)}
 .pattern-stat-lbl{font-size:9px;font-weight:800}
-
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
@@ -361,7 +263,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 v6 <span class="k-badge" id="kDisplay">k=1.00</span></h1>
+  <h1><span class="logo-dot"></span>PC28 v9 锦标赛 <span class="k-badge">TOURNEY</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -370,7 +272,6 @@ th{color:var(--text-dim);font-weight:600}
     <span class="label">最新期号</span>
     <span class="value" id="latestIssue">-</span>
   </div>
-
   <div class="cd-box">
     <div class="cd-label">下期开奖倒计时</div>
     <div class="cd-time" id="countdown">--:--</div>
@@ -418,12 +319,24 @@ th{color:var(--text-dim);font-weight:600}
 </div>
 
 <div class="tab-bar">
-  <div class="tab active" data-tab="trend" onclick="switchTab('trend')">走势图</div>
+  <div class="tab active" data-tab="tourney" onclick="switchTab('tourney')">锦标赛</div>
+  <div class="tab" data-tab="trend" onclick="switchTab('trend')">走势图</div>
   <div class="tab" data-tab="metrics" onclick="switchTab('metrics')">指标明细</div>
   <div class="tab" data-tab="history" onclick="switchTab('history')">对错记录</div>
 </div>
 
-<div class="tab-content active" id="tab-trend">
+<div class="tab-content active" id="tab-tourney">
+  <div class="card">
+    <h2>锦标赛预测报告</h2>
+    <div class="tourney-report" id="tourneyReport">
+      <div style="text-align:center;color:var(--text-dim);padding:20px;font-size:12px">
+        等待数据...
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-content" id="tab-trend">
   <div class="card">
     <h2>最近 100 期走势</h2>
     <div class="trend-wrap">
@@ -443,38 +356,57 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>7 项硬指标（排序依据）</h2>
+    <h2>六维度指标(小组赛用)</h2>
     <table id="metricsTable">
-      <thead><tr><th>组合</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th><th>排名</th></tr></thead>
+      <thead>
+        <tr>
+          <th>组合</th>
+          <th>D1<br><span style="font-size:9px">压制</span></th>
+          <th>D2<br><span style="font-size:9px">失衡</span></th>
+          <th>D3<br><span style="font-size:9px">反常</span></th>
+          <th>D4<br><span style="font-size:9px">复杂</span></th>
+          <th>D5<br><span style="font-size:9px">爆发</span></th>
+          <th>D6<br><span style="font-size:9px">稀缺</span></th>
+          <th>总分</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     </table>
   </div>
   <div class="card">
-    <h2>关键指标可视化</h2>
-    <div class="metrics-grid" id="metricBoxes"></div>
+    <h2>维度权重说明</h2>
+    <table style="font-size:11px">
+      <thead>
+        <tr><th>维度</th><th>小组赛</th><th>决赛</th><th>季军战</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>D1 压制</td><td>0.25</td><td>0.10</td><td>0.05</td></tr>
+        <tr><td>D2 失衡</td><td>0.20</td><td>0.15</td><td>0.25</td></tr>
+        <tr><td>D3 反常</td><td>0.15</td><td>0.20</td><td>0.15</td></tr>
+        <tr><td>D4 复杂</td><td>0.15</td><td>0.20</td><td>0.15</td></tr>
+        <tr><td>D5 爆发</td><td>0.15</td><td>0.15</td><td>0.10</td></tr>
+        <tr><td>D6 稀缺</td><td>0.10</td><td>0.20</td><td>0.30</td></tr>
+      </tbody>
+    </table>
   </div>
 </div>
 
 <div class="tab-content" id="tab-history">
   <div class="card">
-    <h2>预测对错记录（最近 50 期）</h2>
+    <h2>预测对错记录(最近 50 期)</h2>
     <div class="summary" id="summaryBox"></div>
     <div style="overflow-x:auto;margin-top:10px">
       <table id="historyTable" class="history-table">
         <thead>
           <tr>
-            <th>期号</th>
-            <th>时间</th>
-            <th>开奖号码</th>
-            <th>组合</th>
-            <th>形态</th>
-            <th>对错</th>
+            <th>期号</th><th>时间</th><th>开奖号码</th>
+            <th>组合</th><th>形态</th><th>对错</th>
           </tr>
         </thead>
         <tbody></tbody>
       </table>
     </div>
-    <div class="pager" id="historyPager">
+    <div class="pager">
       <button class="pager-btn" id="prevPageBtn" onclick="historyPrevPage()">‹ 上一页</button>
       <div class="pager-info"><span class="cur" id="pagerCur">1</span> <span class="total">/ <span id="pagerTotal">1</span></span></div>
       <button class="pager-btn" id="nextPageBtn" onclick="historyNextPage()">下一页 ›</button>
@@ -494,13 +426,16 @@ const APIS = [
 const COMBOS = ['大双', '大单', '小双', '小单'];
 const WINDOW_SIZE = 60;
 const POLL_INTERVAL = 60000;
-const BACKTEST_EVERY = 10;
-const K_MIN = 0.5, K_MAX = 2.0, K_STEP = 0.1;
 const STICKY_PERIOD = 5;
 const DEFAULT_PERIOD_MS = 210 * 1000;
 const TREND_MAX = 100;
-const HISTORY_REBUILD_COUNT = 50;   // 目标重建 50 期
-const HISTORY_PER_PAGE = 25;         // ★ 每页 25 条
+const HISTORY_REBUILD_COUNT = 50;
+const HISTORY_PER_PAGE = 25;
+
+/* v9 权重表 */
+const W_GROUP   = {D1:0.25, D2:0.20, D3:0.15, D4:0.15, D5:0.15, D6:0.10};
+const W_FINAL   = {D1:0.10, D2:0.15, D3:0.20, D4:0.20, D5:0.15, D6:0.20};
+const W_DEFENSE = {D1:0.05, D2:0.25, D3:0.15, D4:0.15, D5:0.10, D6:0.30};
 
 /* ================================================================
    时间解析 & 格式化
@@ -546,7 +481,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v6',DB_VER=1;let db=null;
+const DB_NAME='pc28_v9',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -561,13 +496,12 @@ function dbGet(s,k){return new Promise((res,rej)=>{const r=db.transaction(s,'rea
 function dbGetAll(s){return new Promise((res,rej)=>{const r=db.transaction(s,'readonly').objectStore(s).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});}
 function dbPut(s,o){return new Promise((res,rej)=>{const r=db.transaction(s,'readwrite').objectStore(s).put(o);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
 function dbPutMany(s,arr){return new Promise((res,rej)=>{const tx=db.transaction(s,'readwrite');const st=tx.objectStore(s);arr.forEach(o=>st.put(o));tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
-function dbClear(s){return new Promise((res,rej)=>{const r=db.transaction(s,'readwrite').objectStore(s).clear();r.onsuccess=()=>res();r.onerror=()=>rej(r.error);});}
 
 /* ================================================================
    状态
    ================================================================ */
 let state={
-  k:1.0,top1History:[],lastIssue:'',cycleCount:0,lastHistory:[],
+  top1History:[],lastIssue:'',cycleCount:0,lastHistory:[],
   periodMs:DEFAULT_PERIOD_MS,nextDrawTs:0,lastDrawTs:0,
   pendingTick:false,currentPred:null,
   scratchActive:false,latestDraw:null,historyRebuilt:false,
@@ -657,90 +591,279 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   v6 算法
+   ★ v9 锦标赛算法
    ================================================================ */
-function expWeightedFreq(seq,halfLife){
-  const N=seq.length;if(N===0)return Object.fromEntries(COMBOS.map(c=>[c,0]));
-  const lam=Math.log(2)/halfLife;let wsum=0;const weights=[];
-  for(let i=0;i<N;i++){const w=Math.exp(-lam*(N-1-i));weights.push(w);wsum+=w;}
-  wsum=wsum||1;const freq={};
-  for(const c of COMBOS){let s=0;for(let i=0;i<N;i++)if(seq[i]===c)s+=weights[i];freq[c]=s/wsum;}
+
+// ---- 通用工具 ----
+function expWeightedFreq(seq, halfLife) {
+  const N = seq.length;
+  if (N === 0) return Object.fromEntries(COMBOS.map(c => [c, 0]));
+  const lam = Math.log(2) / halfLife;
+  let wsum = 0;
+  const weights = [];
+  for (let i = 0; i < N; i++) {
+    const w = Math.exp(-lam * (N - 1 - i));
+    weights.push(w); wsum += w;
+  }
+  wsum = wsum || 1;
+  const freq = {};
+  for (const c of COMBOS) {
+    let s = 0;
+    for (let i = 0; i < N; i++) if (seq[i] === c) s += weights[i];
+    freq[c] = s / wsum;
+  }
   return freq;
 }
-function getStreak(seq,combo){if(!seq.length||seq[seq.length-1]!==combo)return 0;let s=1;for(let i=seq.length-2;i>=0;i--){if(seq[i]===combo)s++;else break;}return s;}
-function getMiss(seq,combo){const N=seq.length;for(let i=N-1;i>=0;i--)if(seq[i]===combo)return N-1-i;return N;}
-function transitionProb(seq,prevCombo,target){
-  if(!prevCombo)return 0.25;let total=0,match=0;
-  for(let i=1;i<seq.length;i++){if(seq[i-1]===prevCombo){total++;if(seq[i]===target)match++;}}
-  return total===0?0.25:match/total;
-}
-function computeMetrics(seq,k){
-  const N=seq.length;if(N===0)return null;
-  const prevCombo=N>=2?seq[N-2]:null;
-  const counts={};for(const c of COMBOS)counts[c]=0;
-  for(const c of seq)counts[c]++;
-  const half=Math.floor(N/2);
-  const front=seq.slice(0,half),back=seq.slice(half);
-  const frontN=Math.max(front.length,1),backN=Math.max(back.length,1);
-  const frontFreq={},backFreq={};
-  for(const c of COMBOS){frontFreq[c]=front.filter(x=>x===c).length/frontN;backFreq[c]=back.filter(x=>x===c).length/backN;}
-  const H=expWeightedFreq(seq,15);
-  const Hvals=COMBOS.map(c=>H[c]);
-  const Hmax=Math.max(...Hvals),Hmin=Math.min(...Hvals),Hrange=Hmax-Hmin;
-  const avgCnt=N/4;const metrics={};
-  for(const c of COMBOS){
-    const streak=getStreak(seq,c);
-    const P1=100*(1-Math.exp(-k*streak/2));
-    const miss=getMiss(seq,c);
-    const P2=100*(1-Math.exp(-k*miss/10));
-    const cnt=counts[c];
-    const P3=Math.min(100,100*Math.abs(cnt-avgCnt)/avgCnt);
-    const tp=transitionProb(seq,prevCombo,c);
-    const P4=100*tp;
-    const delta=backFreq[c]-frontFreq[c];
-    const P5=50+50*Math.tanh(k*delta*5);
-    const post=(cnt+2*0.25)/(N+2);
-    const P6=100*Math.abs(post-0.25)/0.75;
-    const P7=Hrange>1e-9?100*(H[c]-Hmin)/Hrange:50;
-    metrics[c]=[+P1.toFixed(2),+P2.toFixed(2),+P3.toFixed(2),+P4.toFixed(2),+P5.toFixed(2),+P6.toFixed(2),+P7.toFixed(2)];
+
+function getStreak(seq, combo) {
+  if (!seq.length || seq[seq.length - 1] !== combo) return 0;
+  let s = 1;
+  for (let i = seq.length - 2; i >= 0; i--) {
+    if (seq[i] === combo) s++; else break;
   }
-  return metrics;
+  return s;
 }
-function strictSort(metrics){
-  return[...COMBOS].sort((a,b)=>{const ma=metrics[a],mb=metrics[b];for(let i=0;i<7;i++)if(mb[i]!==ma[i])return mb[i]-ma[i];return 0;});
-}
-function predict(seq,k,applyFixation){
-  const metrics=computeMetrics(seq,k);if(!metrics)return null;
-  let ranked=strictSort(metrics);let fixationTriggered=false;
-  if(applyFixation){
-    const top1=ranked[0];const h=state.top1History;
-    if(h.length>=STICKY_PERIOD&&h.slice(-STICKY_PERIOD).every(x=>x===top1)){ranked=ranked.slice(1).concat([top1]);fixationTriggered=true;}
-    state.top1History.push(top1);if(state.top1History.length>20)state.top1History.shift();
+
+function getMiss(seq, combo) {
+  const N = seq.length;
+  for (let i = N - 1; i >= 0; i--) {
+    if (seq[i] === combo) return N - 1 - i;
   }
-  return{main:ranked.slice(0,2),defense:ranked[2],ranked,metrics,k,fixationTriggered};
+  return N;
 }
-function backtestBestK(seqAll){
-  const n=seqAll.length;if(n<60)return{k:state.k};
-  const start=Math.max(40,n-100);
-  const kValues=[];for(let k=K_MIN;k<=K_MAX+1e-9;k+=K_STEP)kValues.push(+k.toFixed(2));
-  let bestK=state.k,bestScore=-1;
-  for(const k of kValues){
-    let mainHits=0,defHits=0,total=0;
-    for(let i=start;i<n;i++){
-      const w=seqAll.slice(Math.max(0,i-40),i);if(w.length<20)continue;
-      const m=computeMetrics(w,k);if(!m)continue;
-      const ranked=strictSort(m);const main=ranked.slice(0,2),defense=ranked[2],actual=seqAll[i];
-      total++;if(main.includes(actual))mainHits++;else if(actual===defense)defHits++;
+
+function transitionProb(seq, prevCombo, target) {
+  if (!prevCombo) return 0.25;
+  let total = 0, match = 0;
+  for (let i = 1; i < seq.length; i++) {
+    if (seq[i - 1] === prevCombo) {
+      total++;
+      if (seq[i] === target) match++;
     }
-    if(total===0)continue;
-    const score=(mainHits*0.7+defHits*0.3)/total;
-    if(score>bestScore){bestScore=score;bestK=k;}
   }
-  return{k:bestK};
+  return total === 0 ? 0.25 : match / total;
+}
+
+function median(arr) {
+  if (!arr.length) return 0;
+  const s = [...arr].sort((a, b) => a - b);
+  const m = Math.floor(s.length / 2);
+  return s.length % 2 === 1 ? s[m] : (s[m - 1] + s[m]) / 2;
+}
+
+// ---- 计算六维度 ----
+function computeDimensions(seq) {
+  const N = seq.length;
+  if (N === 0) return null;
+
+  // 指数加权频率(半衰期 15)
+  const H = expWeightedFreq(seq, 15);
+
+  // D2 用到的中位数 / MAD
+  const hVals = COMBOS.map(c => H[c]);
+  const medianH = median(hVals);
+  const deviations = hVals.map(v => Math.abs(v - medianH));
+  const MAD = median(deviations) + 1e-10;
+
+  // 转移概率(上一期组合)
+  const prev = N >= 2 ? seq[N - 2] : null;
+  const tp = {};
+  for (const c of COMBOS) tp[c] = transitionProb(seq, prev, c);
+
+  // D4 用到的 4 等份分段
+  const segLen = Math.max(1, Math.floor(N / 4));
+  const segments = [
+    seq.slice(0, segLen),
+    seq.slice(segLen, 2 * segLen),
+    seq.slice(2 * segLen, 3 * segLen),
+    seq.slice(3 * segLen),
+  ];
+
+  // 最近 10 期
+  const last10 = seq.slice(-10);
+
+  const dims = {};
+  for (const c of COMBOS) {
+    // D1 近期统治力
+    const streak = getStreak(seq, c);
+    const miss = getMiss(seq, c);
+    const D1 = 100 * (streak + 1) / (streak + miss + 1);
+
+    // D2 冷热失衡度(可能为负数)
+    const rawD2 = 100 * (H[c] - medianH) / MAD;
+    const D2 = Math.max(-300, Math.min(300, rawD2));
+
+    // D3 转移反常度
+    const D3 = 100 * Math.abs(tp[c] - 0.25) / 0.75;
+
+    // D4 时序复杂度
+    const freqs = segments.map(seg => {
+      if (seg.length === 0) return 0;
+      return seg.filter(x => x === c).length / seg.length;
+    });
+    const diffSum = Math.abs(freqs[0] - freqs[1])
+                  + Math.abs(freqs[1] - freqs[2])
+                  + Math.abs(freqs[2] - freqs[3]);
+    const D4 = 100 * diffSum / 1.5;
+
+    // D5 尾部风险(最近 10 期最大连出)
+    let maxStreakRecent = 0, cur = 0;
+    for (const x of last10) {
+      if (x === c) { cur++; maxStreakRecent = Math.max(maxStreakRecent, cur); }
+      else cur = 0;
+    }
+    const D5 = 100 * maxStreakRecent / 10;
+
+    // D6 长期稀缺度
+    const totalMiss = getMiss(seq, c);
+    const D6 = 100 * (1 - Math.exp(-totalMiss / 20));
+
+    dims[c] = {
+      D1: +D1.toFixed(2), D2: +D2.toFixed(2), D3: +D3.toFixed(2),
+      D4: +D4.toFixed(2), D5: +D5.toFixed(2), D6: +D6.toFixed(2),
+    };
+  }
+  return dims;
+}
+
+// ---- 加权得分 ----
+function weightedScore(dim, W) {
+  return W.D1 * dim.D1 + W.D2 * dim.D2 + W.D3 * dim.D3
+       + W.D4 * dim.D4 + W.D5 * dim.D5 + W.D6 * dim.D6;
+}
+
+// ---- 小组循环赛 ----
+function groupStage(dims, penaltyCombo) {
+  // 防固化惩罚
+  const adjusted = {};
+  for (const c of COMBOS) {
+    const d = { ...dims[c] };
+    if (c === penaltyCombo) {
+      for (const key of ['D1', 'D2', 'D3', 'D4', 'D5', 'D6']) d[key] -= 10;
+    }
+    adjusted[c] = d;
+  }
+
+  // 初始化记录
+  const records = {};
+  for (const c of COMBOS) {
+    records[c] = { points: 0, wins: 0, losses: 0, draws: 0, netScore: 0, matches: {} };
+  }
+
+  // 6 场比赛
+  for (let i = 0; i < COMBOS.length; i++) {
+    for (let j = i + 1; j < COMBOS.length; j++) {
+      const a = COMBOS[i], b = COMBOS[j];
+      const sa = weightedScore(adjusted[a], W_GROUP);
+      const sb = weightedScore(adjusted[b], W_GROUP);
+      records[a].netScore += sa;
+      records[b].netScore += sb;
+      if (sa > sb) {
+        records[a].points += 1; records[a].wins++; records[b].losses++;
+        records[a].matches[b] = { win: true, sa, sb };
+        records[b].matches[a] = { win: false, sa: sb, sb: sa };
+      } else if (sa < sb) {
+        records[b].points += 1; records[b].wins++; records[a].losses++;
+        records[b].matches[a] = { win: true, sa: sb, sb: sa };
+        records[a].matches[b] = { win: false, sa, sb };
+      } else {
+        records[a].points += 0.5; records[b].points += 0.5;
+        records[a].draws++; records[b].draws++;
+        records[a].matches[b] = { win: null, sa, sb };
+        records[b].matches[a] = { win: null, sa: sb, sb: sa };
+      }
+    }
+  }
+
+  // 排序：积分 → 相互战绩 → 净胜分
+  const ranked = [...COMBOS].sort((x, y) => {
+    const rx = records[x], ry = records[y];
+    if (ry.points !== rx.points) return ry.points - rx.points;
+    // 相互战绩
+    const xv = rx.matches[y];
+    if (xv) {
+      if (xv.win === true) return -1;
+      if (xv.win === false) return 1;
+    }
+    // 净胜分
+    return ry.netScore - rx.netScore;
+  });
+
+  return { ranked, records, adjusted };
+}
+
+// ---- 决赛圈 ----
+function finalStage(dims, groupResult) {
+  const ranked = groupResult.ranked;
+  const first = ranked[0], second = ranked[1], third = ranked[2], fourth = ranked[3];
+
+  // 冠军战
+  const sa = weightedScore(dims[first], W_FINAL);
+  const sb = weightedScore(dims[second], W_FINAL);
+  let champion, runnerUp, finalResult;
+  if (sa >= sb) {
+    champion = first; runnerUp = second;
+    finalResult = { winner: first, loser: second, wScore: sa, lScore: sb };
+  } else {
+    champion = second; runnerUp = first;
+    finalResult = { winner: second, loser: first, wScore: sb, lScore: sa };
+  }
+
+  // 季军战
+  const sc = weightedScore(dims[third], W_DEFENSE);
+  const sd = weightedScore(dims[fourth], W_DEFENSE);
+  let defense, eliminated, thirdPlaceResult;
+  if (sc >= sd) {
+    defense = third; eliminated = fourth;
+    thirdPlaceResult = { winner: third, loser: fourth, wScore: sc, lScore: sd };
+  } else {
+    defense = fourth; eliminated = third;
+    thirdPlaceResult = { winner: fourth, loser: third, wScore: sd, lScore: sc };
+  }
+
+  return { champion, runnerUp, defense, eliminated, finalResult, thirdPlaceResult };
+}
+
+// ---- 主入口 ----
+function predict(seq, k, applyFixation) {
+  if (!seq || seq.length < 8) return null;
+
+  const dims = computeDimensions(seq);
+  if (!dims) return null;
+
+  // 防固化：主推第一(冠军)连续 5 期相同
+  let penaltyCombo = null;
+  if (applyFixation && state.top1History.length >= STICKY_PERIOD) {
+    const last5 = state.top1History.slice(-STICKY_PERIOD);
+    if (last5.every(x => x === last5[0])) penaltyCombo = last5[0];
+  }
+
+  const groupResult = groupStage(dims, penaltyCombo);
+  const finals = finalStage(groupResult.adjusted, groupResult);
+
+  // 记录本轮冠军
+  if (applyFixation) {
+    state.top1History.push(finals.champion);
+    if (state.top1History.length > 20) state.top1History.shift();
+  }
+
+  return {
+    main: [finals.champion, finals.runnerUp],
+    defense: finals.defense,
+    ranked: [finals.champion, finals.runnerUp, finals.defense, finals.eliminated],
+    metrics: dims,
+    k: 1.0,
+    fixationTriggered: penaltyCombo !== null,
+    v9: {
+      group: groupResult,
+      finals: finals,
+      penaltyCombo: penaltyCombo,
+    },
+  };
 }
 
 /* ================================================================
-   历史重建（修复版：数据不足时也能尽力重建）
+   历史重建(修复版)
    ================================================================ */
 async function rebuildHistoryFromDraws(){
   const allDraws=await dbGetAll('draws');
@@ -752,7 +875,6 @@ async function rebuildHistoryFromDraws(){
   const existing=await dbGetAll('preds');
   const existingKeys=new Set(existing.map(p=>p.key));
 
-  // 尽可能重建：目标 50 期，但受限于数据量
   const maxRebuild = Math.min(HISTORY_REBUILD_COUNT, n - MIN_WINDOW);
   const startK = n - maxRebuild;
 
@@ -766,7 +888,7 @@ async function rebuildHistoryFromDraws(){
     if(windowDraws.length < MIN_WINDOW)continue;
 
     const seq=windowDraws.map(d=>d.combo);
-    const pred=predict(seq,state.k,false);
+    const pred=predict(seq, 1.0, false);
     if(!pred)continue;
 
     const actual=asc[k].combo;
@@ -777,7 +899,7 @@ async function rebuildHistoryFromDraws(){
       key:predIssue,issue:predIssue,
       predict_time:asc[k-1].draw_time,
       main:pred.main,defense:pred.defense,
-      ranked:pred.ranked,metrics:pred.metrics,k:state.k,
+      ranked:pred.ranked,metrics:pred.metrics,k:1.0,
       actual:actual,main_hit:mainHit,def_hit:defHit,
       historical:true,
     });
@@ -794,7 +916,7 @@ async function drawTrend(){
   const tbody=document.getElementById('trendBody');
   const allDraws=await dbGetAll('draws');
   if(!allDraws.length){
-    tbody.innerHTML='<tr><td colspan="10" class="trend-empty">暂无数据，请等待拉取...</td></tr>';
+    tbody.innerHTML='<tr><td colspan="10" class="trend-empty">暂无数据...</td></tr>';
     document.getElementById('trendSummary').innerHTML='';
     return;
   }
@@ -952,7 +1074,7 @@ async function tick(){
 
     await drawTrend();
 
-    if(latest.issue===state.lastIssue){setStatus(`无新期（${latest.issue}）`,'ok');return;}
+    if(latest.issue===state.lastIssue){setStatus(`无新期(${latest.issue})`,'ok');return;}
     state.lastIssue=latest.issue;
     state.cycleCount++;
 
@@ -960,32 +1082,25 @@ async function tick(){
     all.sort((a,b)=>(a.ts||0)-(b.ts||0));
     const seqAll=all.map(d=>d.combo);
 
-    if(state.cycleCount%BACKTEST_EVERY===1&&seqAll.length>=60){
-      setStatus('校准 k 值...','warn');
-      const bt=backtestBestK(seqAll);
-      state.k=bt.k;
-      await dbPut('state',{k:'k',value:state.k});
-      document.getElementById('kDisplay').textContent='k='+state.k.toFixed(2);
-    }
-
     const recent=seqAll.slice(-WINDOW_SIZE);
-    const pred=predict(recent,state.k,true);
+    const pred=predict(recent, 1.0, true);
     if(!pred){setStatus('分析失败','bad');return;}
     state.currentPred=pred;
     renderPrediction(pred);
+    renderTourneyReport(pred);
 
     await dbPut('preds',{
       key:latest.issue,issue:latest.issue,
       predict_time:latest.draw_time,
       main:pred.main,defense:pred.defense,
-      ranked:pred.ranked,metrics:pred.metrics,k:pred.k,
+      ranked:pred.ranked,metrics:pred.metrics,k:1.0,
       actual:null,main_hit:null,def_hit:null,historical:false,
     });
 
     await backfill(seqAll,draws);
     await refreshHistory();
 
-    setStatus(`完成（第 ${state.cycleCount} 轮）`,'ok');
+    setStatus(`完成(第 ${state.cycleCount} 轮)`,'ok');
   }catch(e){
     console.error(e);setStatus('出错：'+e.message,'bad');
   }
@@ -1007,7 +1122,7 @@ async function backfill(seqAll,draws){
 }
 
 /* ================================================================
-   对错表：50 期 + 分页 + 组合列
+   对错表
    ================================================================ */
 async function refreshHistory(){
   const preds=await dbGetAll('preds');
@@ -1111,8 +1226,8 @@ function renderHistoryPage(filled, issueToNext){
         <td class="issue-cell">${issueShow}</td>
         <td class="time-cell">${timeShow}</td>
         <td class="nums-cell">${numsShow}</td>
-        <td class="combo-cell"><span class="combo-tag ${comboCls}">${combo}</span></td>
-        <td class="pattern-cell"><span class="pattern-tag ${patternClass(pattern)}">${pattern}</span></td>
+        <td><span class="combo-tag ${comboCls}">${combo}</span></td>
+        <td><span class="pattern-tag ${patternClass(pattern)}">${pattern}</span></td>
         <td class="${cls}">${mark}</td>
       `;
       tbody.appendChild(tr);
@@ -1134,7 +1249,7 @@ function historyNextPage(){
 }
 
 /* ================================================================
-   UI
+   UI 渲染
    ================================================================ */
 function setStatus(msg,type){
   const el=document.getElementById('statusText');
@@ -1158,6 +1273,7 @@ function setLatest(d){
   parityBox.textContent=isOdd?'单':'双';
   parityBox.className='size-box '+(isOdd?'parity-odd':'parity-even');
 }
+
 function renderPrediction(pred){
   const mainStr=pred.main.join('·');
   const defStr=pred.defense||'无';
@@ -1167,26 +1283,102 @@ function renderPrediction(pred){
   const fixEl=document.getElementById('fixationMsg');
   fixEl.textContent=pred.fixationTriggered?'⚠️ 防固化触发':'';
   fixEl.className=pred.fixationTriggered?'warn':'';
+
+  // 指标表
   const tbody=document.querySelector('#metricsTable tbody');
   tbody.innerHTML='';
   pred.ranked.forEach((c,idx)=>{
     const m=pred.metrics[c];
+    const total=weightedScore(m,W_GROUP);
     const tr=document.createElement('tr');
     if(idx<2)tr.style.background='#ecfdf5';
     else if(idx===2)tr.style.background='#fffbeb';
-    tr.innerHTML=`<td><b>${c}</b></td>${m.map(v=>`<td class="num">${v.toFixed(1)}</td>`).join('')}<td>[${idx+1}]</td>`;
+    tr.innerHTML=`<td><b>${c}</b></td>
+      <td class="num">${m.D1.toFixed(1)}</td>
+      <td class="num">${m.D2.toFixed(1)}</td>
+      <td class="num">${m.D3.toFixed(1)}</td>
+      <td class="num">${m.D4.toFixed(1)}</td>
+      <td class="num">${m.D5.toFixed(1)}</td>
+      <td class="num">${m.D6.toFixed(1)}</td>
+      <td class="num"><b>${total.toFixed(1)}</b></td>`;
     tbody.appendChild(tr);
   });
-  const boxes=document.getElementById('metricBoxes');
-  boxes.innerHTML='';
-  const top=pred.main[0];const m=pred.metrics[top];
-  const labels=['P1压制','P2遗漏','P3异常','P4转移','P5动量','P6后验','P7对比'];
-  m.forEach((v,i)=>{
-    const div=document.createElement('div');
-    div.className='metric-box';
-    div.innerHTML=`<div class="mv">${v.toFixed(0)}</div><div class="ml">${labels[i]}</div>`;
-    boxes.appendChild(div);
-  });
+}
+
+function renderTourneyReport(pred){
+  const el=document.getElementById('tourneyReport');
+  if(!pred || !pred.v9){
+    el.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:20px;font-size:12px">等待数据...</div>';
+    return;
+  }
+  const g=pred.v9.group;
+  const f=pred.v9.finals;
+  const records=g.records;
+
+  // 小组赛积分排名
+  const rankRows=g.ranked.map((c,idx)=>{
+    const r=records[c];
+    let medal='';
+    let cls='';
+    if(idx===0){medal='🥇';cls='champion';}
+    else if(idx===1){medal='🥈';cls='runnerup';}
+    else if(idx===2){medal='🥉';cls='defense';}
+    else medal='4️⃣';
+    const wl=`${r.wins}胜${r.losses}负${r.draws>0?'+'+r.draws+'平':''}`;
+    return `<div class="rank-row ${cls}">
+      <span class="rank-medal">${medal}</span>
+      <span class="rank-name">${c}</span>
+      <span class="rank-points">${r.points}分 (${wl})</span>
+    </div>`;
+  }).join('');
+
+  // 决赛
+  const finalRow=`<div class="battle-row">
+    <span class="battle-label">🏆 冠军战</span>
+    <span class="battle-vs">
+      <span class="battle-win-name">${f.finalResult.winner}</span>
+      <span class="battle-score-win">(${f.finalResult.wScore.toFixed(1)})</span>
+      <span style="color:#9ca3af">胜</span>
+      <span class="battle-lose-name">${f.finalResult.loser}</span>
+      <span class="battle-score-lose">(${f.finalResult.lScore.toFixed(1)})</span>
+    </span>
+  </div>`;
+
+  const thirdRow=`<div class="battle-row">
+    <span class="battle-label">🥉 季军战</span>
+    <span class="battle-vs">
+      <span class="battle-win-name">${f.thirdPlaceResult.winner}</span>
+      <span class="battle-score-win">(${f.thirdPlaceResult.wScore.toFixed(1)})</span>
+      <span style="color:#9ca3af">胜</span>
+      <span class="battle-lose-name">${f.thirdPlaceResult.loser}</span>
+      <span class="battle-score-lose">(${f.thirdPlaceResult.lScore.toFixed(1)})</span>
+    </span>
+  </div>`;
+
+  let penaltyNote='';
+  if(pred.v9.penaltyCombo){
+    penaltyNote=`<div style="font-size:10px;color:#dc2626;padding:4px 8px;margin-bottom:6px;background:#fef2f2;border-radius:6px;border:1px solid #fecaca">
+      ⚠️ 防固化：${pred.v9.penaltyCombo} 所有维度 -10 分
+    </div>`;
+  }
+
+  el.innerHTML=`
+    ${penaltyNote}
+    <div class="tourney-section">
+      <div class="sec-title">📊 小组循环赛(6 场)</div>
+      ${rankRows}
+    </div>
+    <div class="tourney-section">
+      <div class="sec-title">🏁 决赛圈</div>
+      ${finalRow}
+      ${thirdRow}
+    </div>
+    <div style="text-align:center;padding-top:8px;border-top:1px dashed #fcd34d;margin-top:8px">
+      <span style="font-size:12px;font-weight:800;color:#92400e">
+        🎯 主推：${pred.main.join('·')} &nbsp;&nbsp; 防守：${pred.defense}
+      </span>
+    </div>
+  `;
 }
 
 function switchTab(name){
@@ -1200,8 +1392,6 @@ function switchTab(name){
    ================================================================ */
 async function boot(){
   await openDB();
-  const savedK=await dbGet('state','k');
-  if(savedK&&savedK.value){state.k=savedK.value;document.getElementById('kDisplay').textContent='k='+state.k.toFixed(2);}
   updateScratchBtn();
   await refreshHistory();
   await tick();
