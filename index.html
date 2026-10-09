@@ -7,7 +7,6 @@
 <style>
 :root{
   --bg:#f2f4f8;
-  --bg-2:#e9edf4;
   --card:#ffffff;
   --card-2:#f8fafc;
   --border:#e3e8f0;
@@ -44,7 +43,6 @@ body{
   min-height:100vh;padding-bottom:24px;
   -webkit-font-smoothing:antialiased;
 }
-
 .card{
   background:var(--card);
   border:1px solid var(--border);
@@ -53,7 +51,6 @@ body{
   margin-bottom:10px;
   box-shadow:var(--shadow-md);
 }
-
 h1{
   font-size:16px;margin:0 0 8px;
   color:var(--text);
@@ -76,17 +73,14 @@ h2{
 h2 .h2-title{flex:1;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 h2 .h2-title b{color:var(--accent);font-weight:800}
 h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:11px;margin-left:4px}
-
 .row{display:flex;justify-content:space-between;margin:5px 0;align-items:center}
 .label{color:var(--text-dim);font-size:12px;font-weight:500}
 .value{font-weight:700;color:var(--text)}
-
 table{width:100%;border-collapse:collapse;font-size:12px}
 th,td{padding:4px 2px;text-align:center;border-bottom:1px solid var(--border)}
 th{color:var(--text-dim);font-weight:600}
 .num{text-align:right;font-variant-numeric:tabular-nums}
 .hit{color:var(--green)}.miss{color:var(--red)}.empty{color:var(--text-dim)}
-
 .btn{
   background:linear-gradient(135deg, #3b82f6, #2563eb);
   color:#fff;border:none;border-radius:10px;
@@ -104,10 +98,6 @@ th{color:var(--text-dim);font-weight:600}
   box-shadow:var(--shadow-sm);
 }
 .btn-outline:active{background:var(--card-2)}
-.btn-green{
-  background:linear-gradient(135deg, #10b981, #059669);
-  box-shadow:0 2px 8px rgba(16,185,129,0.35);
-}
 .btn-copy{
   background:linear-gradient(135deg, #8b5cf6, #7c3aed);
   padding:5px 14px;font-size:11px;border-radius:8px;
@@ -123,7 +113,6 @@ th{color:var(--text-dim);font-weight:600}
   box-shadow:0 2px 8px rgba(6,182,212,0.35);
 }
 .btn-scratch:active{transform:scale(0.96)}
-
 .status{font-size:11px;color:var(--text-dim);margin-top:6px}
 .pulse{
   display:inline-block;width:7px;height:7px;border-radius:50%;
@@ -138,7 +127,6 @@ th{color:var(--text-dim);font-weight:600}
 }
 @keyframes copied{0%{transform:scale(1)}30%{transform:scale(1.15)}100%{transform:scale(1)}}
 @keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
-
 .tab-bar{display:flex;gap:6px;margin-bottom:10px}
 .tab{
   flex:1;padding:9px 6px;text-align:center;
@@ -155,7 +143,6 @@ th{color:var(--text-dim);font-weight:600}
   box-shadow:0 4px 12px rgba(59,130,246,0.4);
 }
 .tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .25s ease}
-
 .metrics-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:11px}
 .metric-box{
   background:linear-gradient(135deg, #f0f5ff 0%, #ede9fe 100%);
@@ -164,12 +151,8 @@ th{color:var(--text-dim);font-weight:600}
   text-align:center;
   box-shadow:var(--shadow-sm);
 }
-.metric-box .mv{
-  font-size:17px;font-weight:800;
-  color:#4f46e5;
-}
+.metric-box .mv{font-size:17px;font-weight:800;color:#4f46e5}
 .metric-box .ml{font-size:10px;color:var(--text-dim);margin-top:2px;font-weight:600}
-
 .k-badge{
   display:inline-block;padding:3px 10px;border-radius:10px;
   background:linear-gradient(135deg, #ede9fe, #dbeafe);
@@ -177,7 +160,6 @@ th{color:var(--text-dim);font-weight:600}
   color:#6d28d9;font-weight:800;font-size:11px;
 }
 .warn{color:var(--yellow)}
-
 .summary{
   background:linear-gradient(135deg, #f8fafc, #f0f5ff);
   border:1px solid var(--border);
@@ -186,7 +168,6 @@ th{color:var(--text-dim);font-weight:600}
 }
 .summary .sv{font-size:17px;font-weight:800;color:var(--text)}
 .summary .sl{font-size:10px;color:var(--text-dim);margin-top:1px;font-weight:600}
-
 .cd-box{
   background:linear-gradient(135deg, #eff6ff 0%, #f5f3ff 100%);
   border:1px solid #e0e7ff;
@@ -200,32 +181,9 @@ th{color:var(--text-dim);font-weight:600}
   letter-spacing:2px;line-height:1.1;
   text-shadow:0 2px 8px rgba(79,70,229,0.15);
 }
-.cd-time.urgent{
-  color:#ef4444;
-  text-shadow:0 2px 8px rgba(239,68,68,0.2);
-  animation:p .8s infinite;
-}
-.cd-time.soon{
-  color:#f59e0b;
-  text-shadow:0 2px 8px rgba(245,158,11,0.2);
-}
+.cd-time.urgent{color:#ef4444;text-shadow:0 2px 8px rgba(239,68,68,0.2);animation:p .8s infinite}
+.cd-time.soon{color:#f59e0b;text-shadow:0 2px 8px rgba(245,158,11,0.2)}
 .cd-sub{font-size:10px;color:var(--text-dim);margin-top:6px;font-weight:500}
-
-.notify-badge{
-  display:inline-block;padding:4px 12px;border-radius:10px;
-  font-size:11px;font-weight:700;
-  background:#f1f5f9;color:var(--text-dim);
-  border:1px solid var(--border-strong);
-}
-.notify-badge.on{
-  background:var(--green-bg);color:#059669;
-  border-color:#6ee7b7;
-}
-.notify-badge.off{
-  background:var(--red-bg);color:#dc2626;
-  border-color:#fca5a5;
-}
-
 .progress-wrap{
   margin-top:10px;background:#e9edf4;
   border-radius:10px;height:10px;overflow:hidden;
@@ -240,18 +198,9 @@ th{color:var(--text-dim);font-weight:600}
   border-radius:10px;
   box-shadow:0 0 8px rgba(59,130,246,0.5);
 }
-.progress-bar.soon{
-  background:linear-gradient(90deg, #f59e0b, #fb923c);
-  box-shadow:0 0 8px rgba(245,158,11,0.5);
-}
-.progress-bar.urgent{
-  background:linear-gradient(90deg, #ef4444, #dc2626);
-  box-shadow:0 0 8px rgba(239,68,68,0.6);
-  animation:p .8s infinite;
-}
+.progress-bar.soon{background:linear-gradient(90deg, #f59e0b, #fb923c);box-shadow:0 0 8px rgba(245,158,11,0.5)}
+.progress-bar.urgent{background:linear-gradient(90deg, #ef4444, #dc2626);box-shadow:0 0 8px rgba(239,68,68,0.6);animation:p .8s infinite}
 .progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);margin-top:4px;font-weight:600}
-
-/* ============ 预测单行 ============ */
 .pred-line{
   display:flex;justify-content:center;align-items:baseline;gap:20px;
   padding:16px 6px;font-weight:800;
@@ -263,8 +212,6 @@ th{color:var(--text-dim);font-weight:600}
 .pred-line .lbl{font-weight:600;color:var(--text-dim);font-size:.8em;margin-right:4px}
 .pred-line .main-val{color:#059669}
 .pred-line .def-val{color:#d97706}
-
-/* ============ 最新一期开奖 ============ */
 .scratch-wrap{
   position:relative;margin-top:8px;border-radius:16px;overflow:hidden;
   background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -277,11 +224,7 @@ th{color:var(--text-dim);font-weight:600}
   display:flex;flex-direction:column;justify-content:center;align-items:center;
   padding:14px 6px;
 }
-.num-row{
-  display:flex;align-items:center;justify-content:center;
-  gap:4px;flex-wrap:nowrap;width:100%;
-}
-
+.num-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%}
 .num-box{
   width:46px;height:46px;
   background:#fff;
@@ -289,81 +232,39 @@ th{color:var(--text-dim);font-weight:600}
   display:flex;align-items:center;justify-content:center;
   font-size:24px;font-weight:900;
   border:1.5px solid var(--border);
-  box-shadow:
-    0 2px 6px rgba(15,23,42,0.06),
-    inset 0 -2px 0 rgba(15,23,42,0.04);
+  box-shadow:0 2px 6px rgba(15,23,42,0.06), inset 0 -2px 0 rgba(15,23,42,0.04);
   flex-shrink:0;
   font-family:-apple-system,"PingFang SC",sans-serif;
 }
 .op{font-size:16px;font-weight:800;color:var(--text-faint);padding:0 2px;flex-shrink:0}
-
 .sum-box{
   width:50px;height:50px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
   font-size:26px;font-weight:900;color:#fff;
   background:linear-gradient(135deg, #3b82f6, #2563eb);
-  box-shadow:
-    0 4px 12px rgba(59,130,246,0.4),
-    inset 0 -2px 0 rgba(0,0,0,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
   flex-shrink:0;
   font-family:-apple-system,"PingFang SC",sans-serif;
 }
-.sep{
-  width:0;height:32px;
-  border-left:2px dotted #cbd5e1;
-  margin:0 8px;flex-shrink:0;
-}
+.sep{width:0;height:32px;border-left:2px dotted #cbd5e1;margin:0 8px;flex-shrink:0}
 .size-box{
   width:46px;height:46px;border-radius:12px;
   display:flex;align-items:center;justify-content:center;
   font-size:23px;font-weight:900;color:#fff;
-  box-shadow:
-    0 4px 12px rgba(15,23,42,0.15),
-    inset 0 -2px 0 rgba(0,0,0,0.15),
-    inset 0 1px 0 rgba(255,255,255,0.25);
+  box-shadow:0 4px 12px rgba(15,23,42,0.15), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
   flex-shrink:0;
   font-family:-apple-system,"PingFang SC",sans-serif;
 }
-.size-big{
-  background:linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow:0 4px 12px rgba(239,68,68,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
-}
-.size-small{
-  background:linear-gradient(135deg, #3b82f6, #2563eb);
-  box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
-}
-.parity-odd{
-  background:linear-gradient(135deg, #3b82f6, #2563eb);
-  box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
-}
-.parity-even{
-  background:linear-gradient(135deg, #ef4444, #dc2626);
-  box-shadow:0 4px 12px rgba(239,68,68,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25);
-}
-
+.size-big{background:linear-gradient(135deg, #ef4444, #dc2626);box-shadow:0 4px 12px rgba(239,68,68,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
+.size-small{background:linear-gradient(135deg, #3b82f6, #2563eb);box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
+.parity-odd{background:linear-gradient(135deg, #3b82f6, #2563eb);box-shadow:0 4px 12px rgba(59,130,246,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
+.parity-even{background:linear-gradient(135deg, #ef4444, #dc2626);box-shadow:0 4px 12px rgba(239,68,68,0.4), inset 0 -2px 0 rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.25)}
 #scratchCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;display:none;border-radius:16px}
 #scratchCanvas.active{display:block}
-
-/* ============ 走势图 ============ */
-.trend-wrap{
-  max-height:520px;overflow-y:auto;border-radius:12px;
-  background:#fff;
-  border:1px solid var(--border);
-  box-shadow:var(--shadow-sm);
-}
+.trend-wrap{max-height:520px;overflow-y:auto;border-radius:12px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
 .trend-table{width:100%;border-collapse:collapse;font-size:11px}
-.trend-table th{
-  position:sticky;top:0;
-  background:#f8fafc;
-  color:var(--text-dim);padding:8px 1px;font-weight:700;
-  z-index:2;font-size:10px;border-bottom:1.5px solid var(--border);
-}
-.trend-table td{
-  padding:4px 1px;text-align:center;
-  border-bottom:1px solid #f1f5f9;
-  height:24px;vertical-align:middle;
-}
+.trend-table th{position:sticky;top:0;background:#f8fafc;color:var(--text-dim);padding:8px 1px;font-weight:700;z-index:2;font-size:10px;border-bottom:1.5px solid var(--border)}
+.trend-table td{padding:4px 1px;text-align:center;border-bottom:1px solid #f1f5f9;height:24px;vertical-align:middle}
 .trend-table tr.latest td{background:#eff6ff}
 .trend-table tr.latest .issue{color:var(--accent);font-weight:800}
 .trend-table tr.hidden td{color:var(--text-faint) !important;font-style:italic}
@@ -371,10 +272,7 @@ th{color:var(--text-dim);font-weight:600}
 .trend-table tr.hidden .hidden-q{display:inline-block;color:var(--text-faint);font-weight:800;font-size:14px;letter-spacing:1px}
 .trend-table .issue{color:var(--text-dim);font-size:10px;font-weight:600}
 .trend-table .val{font-weight:800;font-variant-numeric:tabular-nums;color:var(--text)}
-.trend-table .tag{
-  display:inline-block;padding:1px 6px;border-radius:5px;
-  font-size:10px;min-width:18px;line-height:16px;font-weight:800;
-}
+.trend-table .tag{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;min-width:18px;line-height:16px;font-weight:800}
 .tag-big{background:var(--red-bg);color:#b91c1c}
 .tag-small{background:var(--blue-bg);color:#1d4ed8}
 .tag-odd{background:var(--blue-bg);color:#1d4ed8}
@@ -384,24 +282,64 @@ th{color:var(--text-dim);font-weight:600}
 .trend-empty{padding:24px;text-align:center;color:var(--text-dim);font-size:12px}
 .hidden-q{display:none}
 
-/* ============ 对错明细 ============ */
 .history-table{font-size:11px}
 .history-table th{padding:7px 1px;font-size:10px;color:var(--text-dim);font-weight:700}
 .history-table td{padding:5px 1px;font-size:10px}
 .history-table .issue-cell{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums;font-weight:600}
 .history-table .time-cell{font-size:10px;color:var(--text-dim);font-variant-numeric:tabular-nums}
 .history-table .nums-cell{font-size:10px;font-variant-numeric:tabular-nums;font-weight:800;color:var(--text)}
+.history-table .combo-cell{text-align:center}
 .history-table .pattern-cell{text-align:center}
-.pattern-tag{
-  display:inline-block;padding:2px 6px;border-radius:5px;
-  font-size:9px;font-weight:800;
-}
+.pattern-tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:800}
 .pt-baozi{background:var(--purple-bg);color:#6d28d9}
 .pt-shunzi{background:#cffafe;color:#0e7490}
 .pt-duizi{background:var(--yellow-bg);color:#b45309}
 .pt-zaliu{background:#f1f5f9;color:#64748b}
 
-/* ============ 形态统计 ============ */
+.combo-tag{
+  display:inline-block;padding:2px 8px;border-radius:6px;
+  font-size:10px;font-weight:800;letter-spacing:0.5px;
+  min-width:32px;
+}
+.combo-dadian{background:#fee2e2;color:#b91c1c}
+.combo-dashuang{background:#fed7aa;color:#c2410c}
+.combo-xiaodian{background:#dbeafe;color:#1d4ed8}
+.combo-xiaoshuang{background:#cffafe;color:#0e7490}
+
+.pager{
+  display:flex;justify-content:center;align-items:center;gap:8px;
+  margin-top:12px;padding:8px;
+  background:linear-gradient(135deg, #f8fafc, #f0f5ff);
+  border:1px solid var(--border);
+  border-radius:10px;
+}
+.pager-btn{
+  background:#fff;
+  border:1.5px solid var(--border-strong);
+  color:var(--text-2);
+  border-radius:8px;
+  padding:6px 14px;
+  font-size:12px;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .15s;
+  box-shadow:var(--shadow-sm);
+  min-width:64px;
+}
+.pager-btn:active{transform:scale(0.96);background:var(--card-2)}
+.pager-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none}
+.pager-info{
+  font-size:12px;
+  font-weight:700;
+  color:var(--text);
+  padding:0 8px;
+  font-variant-numeric:tabular-nums;
+  min-width:80px;
+  text-align:center;
+}
+.pager-info .cur{color:var(--accent);font-weight:900;font-size:14px}
+.pager-info .total{color:var(--text-dim)}
+
 .pattern-stats{
   background:linear-gradient(135deg, #f8fafc, #f0f5ff);
   border:1px solid var(--border);
@@ -414,7 +352,6 @@ th{color:var(--text-dim);font-weight:600}
 .pattern-stat-val{font-size:18px;font-weight:900;color:var(--text)}
 .pattern-stat-lbl{font-size:9px;font-weight:800}
 
-/* 滚动条美化 */
 ::-webkit-scrollbar{width:8px;height:8px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
@@ -440,17 +377,6 @@ th{color:var(--text-dim);font-weight:600}
     <div class="cd-sub" id="cdSub">等待数据...</div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
     <div class="progress-labels"><span id="cdStart">--:--</span><span id="cdEnd">--:--</span></div>
-  </div>
-
-  <div class="row" style="margin-top:10px">
-    <span class="label">通知</span>
-    <span class="value">
-      <span class="notify-badge" id="notifyBadge">未授权</span>
-      <button class="btn btn-sm btn-green" id="notifyBtn" onclick="enableNotify()">开启</button>
-    </span>
-  </div>
-  <div style="text-align:center;margin-top:8px">
-    <button class="btn btn-sm btn-outline" onclick="testNotify()">测试通知</button>
   </div>
   <div class="status" id="statusMsg"></div>
 </div>
@@ -517,7 +443,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>7 项硬指标(排序依据)</h2>
+    <h2>7 项硬指标（排序依据）</h2>
     <table id="metricsTable">
       <thead><tr><th>组合</th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th><th>P7</th><th>排名</th></tr></thead>
       <tbody></tbody>
@@ -531,20 +457,28 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-history">
   <div class="card">
-    <h2>预测对错记录(最近 20 期)</h2>
+    <h2>预测对错记录（最近 50 期）</h2>
     <div class="summary" id="summaryBox"></div>
-    <table id="historyTable" class="history-table" style="margin-top:10px">
-      <thead>
-        <tr>
-          <th>期号</th>
-          <th>时间</th>
-          <th>开奖号码</th>
-          <th>形态</th>
-          <th>对错</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div style="overflow-x:auto;margin-top:10px">
+      <table id="historyTable" class="history-table">
+        <thead>
+          <tr>
+            <th>期号</th>
+            <th>时间</th>
+            <th>开奖号码</th>
+            <th>组合</th>
+            <th>形态</th>
+            <th>对错</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="pager" id="historyPager">
+      <button class="pager-btn" id="prevPageBtn" onclick="historyPrevPage()">‹ 上一页</button>
+      <div class="pager-info"><span class="cur" id="pagerCur">1</span> <span class="total">/ <span id="pagerTotal">1</span></span></div>
+      <button class="pager-btn" id="nextPageBtn" onclick="historyNextPage()">下一页 ›</button>
+    </div>
     <div class="pattern-stats" id="patternStats"></div>
   </div>
 </div>
@@ -565,54 +499,11 @@ const K_MIN = 0.5, K_MAX = 2.0, K_STEP = 0.1;
 const STICKY_PERIOD = 5;
 const DEFAULT_PERIOD_MS = 210 * 1000;
 const TREND_MAX = 100;
-const HISTORY_REBUILD_COUNT = 20;
+const HISTORY_REBUILD_COUNT = 50;   // 目标重建 50 期
+const HISTORY_PER_PAGE = 25;         // ★ 每页 25 条
 
 /* ================================================================
-   通知
-   ================================================================ */
-const NOTIFY_ICON = 'data:image/svg+xml;base64,' + btoa(
-  '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64">' +
-  '<rect width="64" height="64" rx="12" fill="#3b82f6"/>' +
-  '<text x="32" y="44" font-size="30" text-anchor="middle" fill="#fff" ' +
-  'font-family="sans-serif" font-weight="bold">28</text></svg>'
-);
-function notifySupported(){return 'Notification' in window;}
-async function enableNotify(){
-  if(!notifySupported()){alert('此浏览器不支持通知');return;}
-  if(Notification.permission==='granted'){sendNotify('PC28','通知已开启','test');updateNotifyBadge();return;}
-  if(Notification.permission==='denied'){alert('通知被拒绝，请到浏览器设置里手动允许');return;}
-  try{
-    const p=await Notification.requestPermission();updateNotifyBadge();
-    if(p==='granted'){sendNotify('PC28 通知已开启','有新开奖会提醒你','test');setStatus('通知已开启','ok');}
-  }catch(e){alert('请求失败：'+e.message);}
-}
-function sendNotify(title,body,tag){
-  if(!notifySupported()||Notification.permission!=='granted')return;
-  if(document.visibilityState==='visible'){console.log('[跳过-页面可见]',title);return;}
-  try{
-    const n=new Notification(title,{body,tag:tag||'pc28-'+Date.now(),icon:NOTIFY_ICON});
-    setTimeout(()=>{try{n.close();}catch(e){}},12000);
-    n.onclick=()=>{window.focus();n.close();};
-  }catch(e){console.warn('通知失败',e);}
-}
-function updateNotifyBadge(){
-  const el=document.getElementById('notifyBadge'),btn=document.getElementById('notifyBtn');
-  if(!notifySupported()){el.textContent='不支持';el.className='notify-badge off';btn.disabled=true;return;}
-  const p=Notification.permission;
-  if(p==='granted'){el.textContent='已开启';el.className='notify-badge on';btn.textContent='测试';btn.className='btn btn-sm btn-outline';}
-  else if(p==='denied'){el.textContent='被拒绝';el.className='notify-badge off';btn.textContent='帮助';btn.className='btn btn-sm btn-outline';}
-  else{el.textContent='未授权';el.className='notify-badge';btn.textContent='开启';btn.className='btn btn-sm btn-green';}
-}
-function testNotify(){
-  if(Notification.permission!=='granted'){enableNotify();return;}
-  try{
-    const n=new Notification('PC28 测试',{body:'通知功能正常',tag:'test-'+Date.now(),icon:NOTIFY_ICON});
-    setTimeout(()=>n.close(),8000);setStatus('测试通知已发送','ok');
-  }catch(e){alert('失败：'+e.message);}
-}
-
-/* ================================================================
-   时间解析
+   时间解析 & 格式化
    ================================================================ */
 function parseDrawTime(dateStr,timeStr){
   if(!dateStr||!timeStr)return NaN;
@@ -644,6 +535,13 @@ function patternClass(p){
   if(p==='对子')return 'pt-duizi';
   return 'pt-zaliu';
 }
+function comboClass(combo){
+  if(combo==='大单')return 'combo-dadian';
+  if(combo==='大双')return 'combo-dashuang';
+  if(combo==='小单')return 'combo-xiaodian';
+  if(combo==='小双')return 'combo-xiaoshuang';
+  return '';
+}
 
 /* ================================================================
    IndexedDB
@@ -671,8 +569,9 @@ function dbClear(s){return new Promise((res,rej)=>{const r=db.transaction(s,'rea
 let state={
   k:1.0,top1History:[],lastIssue:'',cycleCount:0,lastHistory:[],
   periodMs:DEFAULT_PERIOD_MS,nextDrawTs:0,lastDrawTs:0,
-  pendingTick:false,lastNotifiedIssue:'',currentPred:null,
+  pendingTick:false,currentPred:null,
   scratchActive:false,latestDraw:null,historyRebuilt:false,
+  historyPage:0,
 };
 
 /* ================================================================
@@ -841,30 +740,39 @@ function backtestBestK(seqAll){
 }
 
 /* ================================================================
-   历史重建
+   历史重建（修复版：数据不足时也能尽力重建）
    ================================================================ */
 async function rebuildHistoryFromDraws(){
   const allDraws=await dbGetAll('draws');
-  if(allDraws.length<80)return 0;
+  const MIN_WINDOW = 20;
+  const n=allDraws.length;
+  if(n < MIN_WINDOW + 1) return 0;
+
   const asc=allDraws.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  const n=asc.length;
   const existing=await dbGetAll('preds');
   const existingKeys=new Set(existing.map(p=>p.key));
-  const startK=n-HISTORY_REBUILD_COUNT;
-  if(startK<WINDOW_SIZE)return 0;
+
+  // 尽可能重建：目标 50 期，但受限于数据量
+  const maxRebuild = Math.min(HISTORY_REBUILD_COUNT, n - MIN_WINDOW);
+  const startK = n - maxRebuild;
 
   const newPreds=[];
   for(let k=startK;k<n;k++){
     const predIssue=asc[k-1].issue;
     if(existingKeys.has(predIssue))continue;
-    const windowDraws=asc.slice(Math.max(0,k-WINDOW_SIZE),k);
-    if(windowDraws.length<20)continue;
+
+    const windowStart=Math.max(0,k-WINDOW_SIZE);
+    const windowDraws=asc.slice(windowStart,k);
+    if(windowDraws.length < MIN_WINDOW)continue;
+
     const seq=windowDraws.map(d=>d.combo);
     const pred=predict(seq,state.k,false);
     if(!pred)continue;
+
     const actual=asc[k].combo;
     const mainHit=pred.main.includes(actual)?1:0;
     const defHit=(mainHit===0&&pred.defense===actual)?1:0;
+
     newPreds.push({
       key:predIssue,issue:predIssue,
       predict_time:asc[k-1].draw_time,
@@ -875,7 +783,7 @@ async function rebuildHistoryFromDraws(){
     });
   }
   if(newPreds.length)await dbPutMany('preds',newPreds);
-  console.log(`[历史重建] 新增 ${newPreds.length} 条`);
+  console.log(`[历史重建] 可用数据 ${n} 期，新增 ${newPreds.length} 条`);
   return newPreds.length;
 }
 
@@ -926,10 +834,10 @@ async function drawTrend(){
   const bigCount=visibleDraws.filter(d=>d.sum_val>=14).length;
   const oddCount=visibleDraws.filter(d=>d.sum_val%2===1).length;
   document.getElementById('trendSummary').innerHTML=`
-    <div><div class="sv" style="color:#dc2626">${counts['大单']}</div><div class="sl">大单</div></div>
-    <div><div class="sv" style="color:#dc2626">${counts['大双']}</div><div class="sl">大双</div></div>
-    <div><div class="sv" style="color:#2563eb">${counts['小单']}</div><div class="sl">小单</div></div>
-    <div><div class="sv" style="color:#2563eb">${counts['小双']}</div><div class="sl">小双</div></div>
+    <div><div class="sv" style="color:#b91c1c">${counts['大单']}</div><div class="sl">大单</div></div>
+    <div><div class="sv" style="color:#c2410c">${counts['大双']}</div><div class="sl">大双</div></div>
+    <div><div class="sv" style="color:#1d4ed8">${counts['小单']}</div><div class="sl">小单</div></div>
+    <div><div class="sv" style="color:#0e7490">${counts['小双']}</div><div class="sl">小双</div></div>
     <div><div class="sv">${(bigCount*100/total).toFixed(0)}%</div><div class="sl">大占比</div></div>
     <div><div class="sv">${(oddCount*100/total).toFixed(0)}%</div><div class="sl">单占比</div></div>
   `;
@@ -949,32 +857,19 @@ function initScratch(){
   const ctx=canvas.getContext('2d');
   ctx.setTransform(1,0,0,1,0,0);
   ctx.scale(dpr,dpr);
-
   const grad=ctx.createLinearGradient(0,0,w,h);
-  grad.addColorStop(0,'#cbd5e1');
-  grad.addColorStop(0.5,'#94a3b8');
-  grad.addColorStop(1,'#cbd5e1');
+  grad.addColorStop(0,'#cbd5e1');grad.addColorStop(0.5,'#94a3b8');grad.addColorStop(1,'#cbd5e1');
   ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
   ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
   ctx.fillText('👆 手指滑动刮开',w/2,h/2-4);
   ctx.font='11px sans-serif';
   ctx.fillText('揭晓最新一期开奖',w/2,h/2+14);
-
   state.scratchActive=true;
   updateScratchBtn();
   drawTrend();
-
   let drawing=false;
-  const erase=(x,y)=>{
-    ctx.globalCompositeOperation='destination-out';
-    ctx.beginPath();ctx.arc(x,y,22,0,Math.PI*2);ctx.fill();
-    checkReveal();
-  };
-  const getPos=e=>{
-    const rect=canvas.getBoundingClientRect();
-    const p=e.touches?e.touches[0]:e;
-    return{x:p.clientX-rect.left,y:p.clientY-rect.top};
-  };
+  const erase=(x,y)=>{ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(x,y,22,0,Math.PI*2);ctx.fill();checkReveal();};
+  const getPos=e=>{const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};};
   canvas.onmousedown=canvas.ontouchstart=e=>{e.preventDefault();drawing=true;const{x,y}=getPos(e);erase(x,y);};
   canvas.onmousemove=canvas.ontouchmove=e=>{if(!drawing)return;e.preventDefault();const{x,y}=getPos(e);erase(x,y);};
   canvas.onmouseup=canvas.ontouchend=canvas.onmouseleave=canvas.ontouchcancel=()=>{drawing=false;};
@@ -996,19 +891,10 @@ function revealAll(){
   ctx.setTransform(1,0,0,1,0,0);
   ctx.clearRect(0,0,canvas.width,canvas.height);
   canvas.classList.remove('active');
-  if(state.scratchActive){
-    state.scratchActive=false;
-    updateScratchBtn();
-    drawTrend();
-  }
+  if(state.scratchActive){state.scratchActive=false;updateScratchBtn();drawTrend();}
 }
-function toggleScratch(){
-  if(state.scratchActive){revealAll();}else{initScratch();}
-}
-function updateScratchBtn(){
-  const btn=document.getElementById('scratchBtn');
-  btn.textContent=state.scratchActive?'👁 揭晓':'🎯 刮奖';
-}
+function toggleScratch(){if(state.scratchActive){revealAll();}else{initScratch();}}
+function updateScratchBtn(){const btn=document.getElementById('scratchBtn');btn.textContent=state.scratchActive?'👁 揭晓':'🎯 刮奖';}
 
 /* ================================================================
    复制
@@ -1066,7 +952,7 @@ async function tick(){
 
     await drawTrend();
 
-    if(latest.issue===state.lastIssue){setStatus(`无新期(${latest.issue})`,'ok');return;}
+    if(latest.issue===state.lastIssue){setStatus(`无新期（${latest.issue}）`,'ok');return;}
     state.lastIssue=latest.issue;
     state.cycleCount++;
 
@@ -1096,21 +982,10 @@ async function tick(){
       actual:null,main_hit:null,def_hit:null,historical:false,
     });
 
-    const fillResult=await backfill(seqAll,draws);
+    await backfill(seqAll,draws);
     await refreshHistory();
 
-    if(fillResult&&fillResult.actual){
-      let mark,title;
-      if(fillResult.main_hit){mark='主推🀄✅';title=`上期命中：${mark}`;}
-      else if(fillResult.def_hit){mark='防守🀄✅';title=`上期命中：${mark}`;}
-      else{mark='🌸🈳';title=`上期未中：${mark}`;}
-      sendNotify(title,`上期 ${fillResult.issue} 开 ${fillResult.actual}`,'result-'+fillResult.issue);
-    }
-    if(latest.issue!==state.lastNotifiedIssue){
-      sendNotify(`新期 ${latest.issue} 预测`,`主攻：${pred.main.join('·')} | 防守：${pred.defense||'无'}`,'pred-'+latest.issue);
-      state.lastNotifiedIssue=latest.issue;
-    }
-    setStatus(`完成(第 ${state.cycleCount} 轮)`,'ok');
+    setStatus(`完成（第 ${state.cycleCount} 轮）`,'ok');
   }catch(e){
     console.error(e);setStatus('出错：'+e.message,'bad');
   }
@@ -1120,22 +995,19 @@ async function backfill(seqAll,draws){
   const allPreds=await dbGetAll('preds');
   const predMap={};allPreds.forEach(p=>predMap[p.issue]=p);
   const asc=draws.slice().sort((a,b)=>a.ts-b.ts);
-  const nextCombo={},nextIssue={};
-  for(let i=0;i<asc.length-1;i++){nextCombo[asc[i].issue]=asc[i+1].combo;nextIssue[asc[i].issue]=asc[i+1].issue;}
-  let lastFilled=null;
+  const nextCombo={};
+  for(let i=0;i<asc.length-1;i++){nextCombo[asc[i].issue]=asc[i+1].combo;}
   for(const[issue,p]of Object.entries(predMap)){
     if(p.actual)continue;
     const actual=nextCombo[issue];if(!actual)continue;
     p.actual=actual;p.main_hit=p.main.includes(actual)?1:0;
     p.def_hit=(p.main_hit===0&&p.defense===actual)?1:0;
     await dbPut('preds',p);
-    if(!lastFilled||issue>lastFilled.issue)lastFilled={issue:nextIssue[issue]||issue,actual,main_hit:p.main_hit,def_hit:p.def_hit};
   }
-  return lastFilled;
 }
 
 /* ================================================================
-   对错表 + 形态统计
+   对错表：50 期 + 分页 + 组合列
    ================================================================ */
 async function refreshHistory(){
   const preds=await dbGetAll('preds');
@@ -1143,47 +1015,13 @@ async function refreshHistory(){
 
   const ascDraws=allDraws.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
   const issueToNext={};
-  for(let i=0;i<ascDraws.length-1;i++){
-    issueToNext[ascDraws[i].issue]=ascDraws[i+1];
-  }
+  for(let i=0;i<ascDraws.length-1;i++){issueToNext[ascDraws[i].issue]=ascDraws[i+1];}
 
   const filled=preds.filter(p=>p.actual)
     .sort((a,b)=>(b.issue||'').localeCompare(a.issue||''))
     .slice(0,HISTORY_REBUILD_COUNT);
 
-  const tbody=document.querySelector('#historyTable tbody');
-  tbody.innerHTML='';
-  const patternCounts={豹子:0,顺子:0,对子:0,杂六:0};
-  let validCount=0;
-
-  for(const p of filled){
-    const tr=document.createElement('tr');
-    let mark,cls;
-    if(p.main_hit){mark='主推🀄✅';cls='hit';}
-    else if(p.def_hit){mark='防守🀄✅';cls='hit';}
-    else{mark='🌸🈳';cls='miss';}
-
-    const nextDraw=issueToNext[p.issue];
-    let issueShow='?',timeShow='',numsShow='?',pattern='-';
-    if(nextDraw){
-      issueShow=nextDraw.issue;
-      const m=(nextDraw.draw_time||'').match(/(\d{2}:\d{2}:\d{2})/);
-      timeShow=m?m[1]:'';
-      numsShow=`${nextDraw.num_a}+${nextDraw.num_b}+${nextDraw.num_c}=${nextDraw.sum_val}${nextDraw.combo}`;
-      pattern=detectPattern(nextDraw.num_a,nextDraw.num_b,nextDraw.num_c);
-      patternCounts[pattern]++;
-      validCount++;
-    }
-
-    tr.innerHTML=`
-      <td class="issue-cell">${issueShow}</td>
-      <td class="time-cell">${timeShow}</td>
-      <td class="nums-cell">${numsShow}</td>
-      <td class="pattern-cell"><span class="pattern-tag ${patternClass(pattern)}">${pattern}</span></td>
-      <td class="${cls}">${mark}</td>
-    `;
-    tbody.appendChild(tr);
-  }
+  state.lastHistory=filled;
 
   const total=filled.length;
   const mainHits=filled.filter(p=>p.main_hit).length;
@@ -1197,6 +1035,16 @@ async function refreshHistory(){
     <div><div class="sv">${total?(mainHits*100/total).toFixed(1):0}%</div><div class="sl">主推率</div></div>
   `;
 
+  const patternCounts={豹子:0,顺子:0,对子:0,杂六:0};
+  let validCount=0;
+  for(const p of filled){
+    const nextDraw=issueToNext[p.issue];
+    if(nextDraw){
+      const pat=detectPattern(nextDraw.num_a,nextDraw.num_b,nextDraw.num_c);
+      patternCounts[pat]++;
+      validCount++;
+    }
+  }
   const vc=validCount||1;
   document.getElementById('patternStats').innerHTML=`
     <div class="pattern-stat-item">
@@ -1221,7 +1069,68 @@ async function refreshHistory(){
     </div>
   `;
 
-  state.lastHistory=filled;
+  renderHistoryPage(filled, issueToNext);
+}
+
+function renderHistoryPage(filled, issueToNext){
+  const total=filled.length;
+  const totalPages=Math.max(1, Math.ceil(total/HISTORY_PER_PAGE));
+  if(state.historyPage>=totalPages)state.historyPage=totalPages-1;
+  if(state.historyPage<0)state.historyPage=0;
+
+  const startIdx=state.historyPage*HISTORY_PER_PAGE;
+  const endIdx=Math.min(startIdx+HISTORY_PER_PAGE, total);
+  const pageItems=filled.slice(startIdx, endIdx);
+
+  const tbody=document.querySelector('#historyTable tbody');
+  tbody.innerHTML='';
+
+  if(pageItems.length===0){
+    tbody.innerHTML='<tr><td colspan="6" style="padding:20px;color:var(--text-dim);text-align:center">暂无数据</td></tr>';
+  } else {
+    for(const p of pageItems){
+      const tr=document.createElement('tr');
+      let mark,cls;
+      if(p.main_hit){mark='主推🀄✅';cls='hit';}
+      else if(p.def_hit){mark='防守🀄✅';cls='hit';}
+      else{mark='🌸🈳';cls='miss';}
+
+      const nextDraw=issueToNext[p.issue];
+      let issueShow='?',timeShow='',numsShow='?',pattern='-',combo='-',comboCls='';
+      if(nextDraw){
+        issueShow=nextDraw.issue;
+        const m=(nextDraw.draw_time||'').match(/(\d{2}:\d{2}:\d{2})/);
+        timeShow=m?m[1]:'';
+        numsShow=`${nextDraw.num_a}+${nextDraw.num_b}+${nextDraw.num_c}=${nextDraw.sum_val}`;
+        combo=nextDraw.combo;
+        comboCls=comboClass(combo);
+        pattern=detectPattern(nextDraw.num_a,nextDraw.num_b,nextDraw.num_c);
+      }
+
+      tr.innerHTML=`
+        <td class="issue-cell">${issueShow}</td>
+        <td class="time-cell">${timeShow}</td>
+        <td class="nums-cell">${numsShow}</td>
+        <td class="combo-cell"><span class="combo-tag ${comboCls}">${combo}</span></td>
+        <td class="pattern-cell"><span class="pattern-tag ${patternClass(pattern)}">${pattern}</span></td>
+        <td class="${cls}">${mark}</td>
+      `;
+      tbody.appendChild(tr);
+    }
+  }
+
+  document.getElementById('pagerCur').textContent=state.historyPage+1;
+  document.getElementById('pagerTotal').textContent=totalPages;
+  document.getElementById('prevPageBtn').disabled=(state.historyPage<=0);
+  document.getElementById('nextPageBtn').disabled=(state.historyPage>=totalPages-1);
+}
+
+function historyPrevPage(){
+  if(state.historyPage>0){state.historyPage--;refreshHistory();}
+}
+function historyNextPage(){
+  const totalPages=Math.ceil(state.lastHistory.length/HISTORY_PER_PAGE);
+  if(state.historyPage<totalPages-1){state.historyPage++;refreshHistory();}
 }
 
 /* ================================================================
@@ -1236,17 +1145,14 @@ function setLatest(d){
   const dt=formatDateTime(d.draw_time);
   document.getElementById('latestHeader').innerHTML=
     `<b>第${d.issue}期</b><span class="meta-time">${dt}</span>`;
-
   document.getElementById('lrA').textContent=d.num_a;
   document.getElementById('lrB').textContent=d.num_b;
   document.getElementById('lrC').textContent=d.num_c;
   document.getElementById('lrSum').textContent=d.sum_val;
-
   const isBig=d.sum_val>=14;
   const sizeBox=document.getElementById('lrSize');
   sizeBox.textContent=isBig?'大':'小';
   sizeBox.className='size-box '+(isBig?'size-big':'size-small');
-
   const isOdd=d.sum_val%2===1;
   const parityBox=document.getElementById('lrParity');
   parityBox.textContent=isOdd?'单':'双';
@@ -1258,11 +1164,9 @@ function renderPrediction(pred){
   document.getElementById('predLine').innerHTML=
     `<span class="item"><span class="lbl">主攻：</span><span class="main-val">${mainStr}</span></span>`+
     `<span class="item"><span class="lbl">防守：</span><span class="def-val">${defStr}</span></span>`;
-
   const fixEl=document.getElementById('fixationMsg');
   fixEl.textContent=pred.fixationTriggered?'⚠️ 防固化触发':'';
   fixEl.className=pred.fixationTriggered?'warn':'';
-
   const tbody=document.querySelector('#metricsTable tbody');
   tbody.innerHTML='';
   pred.ranked.forEach((c,idx)=>{
@@ -1296,7 +1200,6 @@ function switchTab(name){
    ================================================================ */
 async function boot(){
   await openDB();
-  updateNotifyBadge();
   const savedK=await dbGet('state','k');
   if(savedK&&savedK.value){state.k=savedK.value;document.getElementById('kDisplay').textContent='k='+state.k.toFixed(2);}
   updateScratchBtn();
