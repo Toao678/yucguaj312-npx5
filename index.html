@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 v10 蒙特卡洛贝叶斯</title>
+<title>PC28 v11c 精准自适应平衡</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -15,20 +15,12 @@
   --yellow:#f59e0b;--yellow-bg:#fef3c7;
   --purple:#8b5cf6;--purple-bg:#ede9fe;
   --blue:#3b82f6;--blue-bg:#dbeafe;
-  --shadow-sm:0 1px 3px rgba(15,23,42,0.06), 0 1px 2px rgba(15,23,42,0.04);
-  --shadow-md:0 4px 12px rgba(15,23,42,0.08), 0 2px 4px rgba(15,23,42,0.04);
+  --shadow-sm:0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 12px rgba(15,23,42,0.08),0 2px 4px rgba(15,23,42,0.04);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;padding:0}
-body{
-  padding:10px;
-  background:linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);
-  background-attachment:fixed;
-  color:var(--text);
-  font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
-  font-size:13px;line-height:1.55;min-height:100vh;padding-bottom:24px;
-  -webkit-font-smoothing:antialiased;
-}
+body{padding:10px;background:linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);background-attachment:fixed;color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:13px;line-height:1.55;min-height:100vh;padding-bottom:24px;-webkit-font-smoothing:antialiased}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-md)}
 h1{font-size:16px;margin:0 0 8px;color:var(--text);font-weight:800;letter-spacing:0.3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 h1 .logo-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);box-shadow:0 0 8px rgba(59,130,246,0.5)}
@@ -61,7 +53,7 @@ th{color:var(--text-dim);font-weight:600}
 .tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .25s ease}
 .metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px}
 .metric-box{background:linear-gradient(135deg,#f0f5ff 0%,#ede9fe 100%);border:1px solid #e0e7ff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);position:relative}
-.metric-box .mv{font-size:20px;font-weight:900;color:#4f46e5;font-variant-numeric:tabular-nums}
+.metric-box .mv{font-size:22px;font-weight:900;color:#4f46e5;font-variant-numeric:tabular-nums}
 .metric-box .ml{font-size:10px;color:var(--text-dim);margin-top:2px;font-weight:700;letter-spacing:0.5px}
 .metric-box .mci{font-size:9px;color:var(--text-faint);margin-top:3px;font-variant-numeric:tabular-nums}
 .metric-box.rank1{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-color:#6ee7b7}
@@ -157,7 +149,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 v10 蒙特卡洛贝叶斯 <span class="k-badge" id="kDisplay">MC·100k</span></h1>
+  <h1><span class="logo-dot"></span>PC28 v11c 精准自适应平衡 <span class="k-badge" id="kDisplay">趋势+补偿 v11c</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -215,7 +207,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-bar">
   <div class="tab active" data-tab="trend" onclick="switchTab('trend')">走势图</div>
-  <div class="tab" data-tab="metrics" onclick="switchTab('metrics')">贝叶斯明细</div>
+  <div class="tab" data-tab="metrics" onclick="switchTab('metrics')">得分明细</div>
   <div class="tab" data-tab="history" onclick="switchTab('history')">对错记录</div>
 </div>
 
@@ -239,36 +231,41 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>后验期望概率 & 95% 置信区间</h2>
+    <h2>综合得分明细（趋势 50% + 补偿 50%）</h2>
     <table id="metricsTable">
       <thead>
         <tr>
           <th>组合</th>
-          <th>期望 E[p]</th>
-          <th>95% 下界</th>
-          <th>95% 上界</th>
-          <th>模拟命中</th>
+          <th>P1<br>一阶</th>
+          <th>P2<br>二阶</th>
+          <th>H<br>活跃</th>
+          <th>补偿<br>comp</th>
+          <th>偏离<br>dev</th>
+          <th>总分</th>
           <th>排名</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
-      <b style="color:var(--text-2)">说明：</b><br>
-      • <b>期望 E[p]</b>：Dirichlet 后验概率均值，用作排序依据<br>
-      • <b>95% CI</b>：区间越窄说明模型越确定<br>
-      • <b>模拟命中</b>：10 万次模拟下一期的经验频率
+      <b style="color:var(--text-2)">公式：</b><br>
+      Score = 0.5 × (0.5×P1 + 0.3×P2 + 0.2×H) × 100 + 0.5 × compensation − 0.3 × deviation<br>
+      • <b>P1</b>：一阶条件概率 P(下期|上期)<br>
+      • <b>P2</b>：二阶条件概率 P(下期|上上期,上期)<br>
+      • <b>H</b>：最近 10 期频率<br>
+      • <b>comp</b>：相对遗漏分（tanh），范围 [-100, +100]<br>
+      • <b>dev</b>：频率偏离 25% 的百分比
     </div>
   </div>
   <div class="card">
-    <h2>各组合置信度可视化</h2>
+    <h2>4 个组合得分</h2>
     <div class="metrics-grid" id="metricBoxes"></div>
   </div>
 </div>
 
 <div class="tab-content" id="tab-history">
   <div class="card">
-    <h2>预测对错记录(最近 50 期)</h2>
+    <h2>预测对错记录（最近 50 期）</h2>
     <div class="summary" id="summaryBox"></div>
     <div style="overflow-x:auto;margin-top:10px">
       <table id="historyTable" class="history-table">
@@ -305,17 +302,16 @@ const APIS = [
 const COMBOS = ['大双', '大单', '小双', '小单'];
 const WINDOW_SIZE = 60;
 const POLL_INTERVAL = 60000;
-const N_SIM = 100000;              // ★ 蒙特卡洛次数
-const PRIOR_ALPHA = 1.0;           // ★ Dirichlet 先验(均匀)
-const STICKY_PERIOD = 5;
-const STICKY_PENALTY = 0.05;       // ★ 防固化扣分
+const STICKY_PERIOD = 4;
+const STICKY_PENALTY = 15;
+const BALANCE_THRESHOLD = 5;
 const DEFAULT_PERIOD_MS = 210 * 1000;
 const TREND_MAX = 100;
 const HISTORY_REBUILD_COUNT = 50;
 const HISTORY_PER_PAGE = 25;
 
 /* ================================================================
-   时间解析
+   时间
    ================================================================ */
 function parseDrawTime(dateStr,timeStr){
   if(!dateStr||!timeStr)return NaN;
@@ -358,18 +354,16 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v10',DB_VER=1;let db=null;
+const DB_NAME='pc28_v11c',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
     if(!d.objectStoreNames.contains('draws')){const s=d.createObjectStore('draws',{keyPath:'issue'});s.createIndex('draw_time','draw_time');}
     if(!d.objectStoreNames.contains('preds'))d.createObjectStore('preds',{keyPath:'key'});
-    if(!d.objectStoreNames.contains('state'))d.createObjectStore('state',{keyPath:'k'});
   };
   req.onsuccess=e=>{db=e.target.result;resolve(db);};
   req.onerror=e=>reject(e.target.error);
 });}
-function dbGet(s,k){return new Promise((res,rej)=>{const r=db.transaction(s,'readonly').objectStore(s).get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
 function dbGetAll(s){return new Promise((res,rej)=>{const r=db.transaction(s,'readonly').objectStore(s).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error);});}
 function dbPut(s,o){return new Promise((res,rej)=>{const r=db.transaction(s,'readwrite').objectStore(s).put(o);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
 function dbPutMany(s,arr){return new Promise((res,rej)=>{const tx=db.transaction(s,'readwrite');const st=tx.objectStore(s);arr.forEach(o=>st.put(o));tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
@@ -468,186 +462,174 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ v10 蒙特卡洛贝叶斯核心
+   ★ v11c 精准自适应平衡核心
    ================================================================ */
+function runAlgorithm(seq, top1History) {
+  const N = seq.length;
+  if (N === 0) return null;
 
-// Box-Muller 标准正态
-function randn(){
-  let u=0,v=0;
-  while(u===0)u=Math.random();
-  while(v===0)v=Math.random();
-  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
-}
+  const cnt = {大双: 0, 大单: 0, 小双: 0, 小单: 0};
+  for (const c of seq) if (cnt[c] !== undefined) cnt[c]++;
 
-// Marsaglia-Tsang Gamma 抽样
-function sampleGamma(shape){
-  if(shape<1){
-    return sampleGamma(shape+1)*Math.pow(Math.random(),1/shape);
+  const lastCombo  = seq[N - 1];
+  const last2Combo = N >= 2 ? seq[N - 2] : null;
+
+  // 1. 一阶条件概率 P(Y|prev)
+  const trans1 = {大双: 1, 大单: 1, 小双: 1, 小单: 1};
+  let totalPrev = 0;
+  for (let i = 1; i < N; i++) {
+    if (seq[i - 1] === lastCombo) { trans1[seq[i]]++; totalPrev++; }
   }
-  const d=shape-1/3;
-  const c=1/Math.sqrt(9*d);
-  while(true){
-    let x,v;
-    do{
-      x=randn();
-      v=1+c*x;
-    }while(v<=0);
-    v=v*v*v;
-    const u=Math.random();
-    if(u<1-0.0331*x*x*x*x)return d*v;
-    if(Math.log(u)<0.5*x*x+d*(1-v+Math.log(v)))return d*v;
-  }
-}
+  totalPrev += 4;
+  const P1 = {};
+  for (const c of COMBOS) P1[c] = trans1[c] / totalPrev;
 
-// Dirichlet 抽样
-function sampleDirichlet(alphas,out){
-  let sum=0;
-  for(let i=0;i<4;i++){
-    const g=sampleGamma(alphas[i]);
-    out[i]=g;
-    sum+=g;
-  }
-  for(let i=0;i<4;i++)out[i]/=sum;
-}
-
-// ★ 主算法：蒙特卡洛贝叶斯
-function runAlgorithm(seq){
-  const N=seq.length;
-  if(N===0)return null;
-
-  // 1. 计数
-  const counts=[0,0,0,0];
-  for(const c of seq){
-    const i=COMBOS.indexOf(c);
-    if(i>=0)counts[i]++;
+  // 2. 二阶条件概率
+  const P2 = {大双: 0.25, 大单: 0.25, 小双: 0.25, 小单: 0.25};
+  if (last2Combo) {
+    const trans2 = {大双: 1, 大单: 1, 小双: 1, 小单: 1};
+    let total2 = 0;
+    for (let i = 2; i < N; i++) {
+      if (seq[i - 2] === last2Combo && seq[i - 1] === lastCombo) {
+        trans2[seq[i]]++; total2++;
+      }
+    }
+    total2 += 4;
+    for (const c of COMBOS) P2[c] = trans2[c] / total2;
   }
 
-  // 2. 后验 Dirichlet 参数 α_i = 1 + cnt_i
-  const alphas=[0,0,0,0];
-  for(let i=0;i<4;i++)alphas[i]=PRIOR_ALPHA+counts[i];
+  // 3. 近期活跃度（最近 10 期）
+  const recent = seq.slice(-10);
+  const recentLen = recent.length || 1;
+  const H = {};
+  for (const c of COMBOS) H[c] = recent.filter(x => x === c).length / recentLen;
 
-  // 3. 蒙特卡洛抽样
-  const samples=new Float64Array(N_SIM*4);
-  const mcHits=new Float64Array(4);
-  const buf=[0,0,0,0];
+  // 4. 相对遗漏补偿分
+  const comp = {};
+  for (const c of COMBOS) {
+    const ci = cnt[c];
+    const expGap = (N + 1) / (ci + 1);
+    let pos = -1;
+    for (let i = N - 1; i >= 0; i--) {
+      if (seq[i] === c) { pos = i; break; }
+    }
+    const actGap = pos === -1 ? N : (N - 1 - pos);
+    comp[c] = 100 * Math.tanh((actGap - expGap) / expGap * 1.5);
+  }
 
-  for(let i=0;i<N_SIM;i++){
-    sampleDirichlet(alphas,buf);
-    const base=i*4;
-    for(let j=0;j<4;j++)samples[base+j]=buf[j];
-    // 模拟下一期
-    const r=Math.random();
-    let cum=0;
-    for(let j=0;j<4;j++){
-      cum+=buf[j];
-      if(r<cum){mcHits[j]++;break;}
+  // 5. 概率偏离惩罚
+  const dev = {};
+  for (const c of COMBOS) {
+    dev[c] = 100 * Math.abs(cnt[c] / N - 0.25) / 0.25;
+  }
+
+  // 6. 合成得分
+  const score = {};
+  for (const c of COMBOS) {
+    const trend = 0.5 * P1[c] + 0.3 * P2[c] + 0.2 * H[c];
+    score[c] = 0.5 * trend * 100 + 0.5 * comp[c] - 0.3 * dev[c];
+  }
+
+  // 7. 初始排序
+  let ranked = [...COMBOS].sort((a, b) => score[b] - score[a]);
+  const top1Raw = ranked[0];
+
+  // 8. 防固化：连续 4 期 Top1 → 扣 15
+  let fixationTriggered = false;
+  const th = top1History || [];
+  if (th.length >= STICKY_PERIOD && th.slice(-STICKY_PERIOD).every(x => x === top1Raw)) {
+    score[top1Raw] -= STICKY_PENALTY;
+    ranked = [...COMBOS].sort((a, b) => score[b] - score[a]);
+    fixationTriggered = true;
+  }
+
+  // 9. 均衡保护：Top1-Top2 < 5 → 踢出最热的
+  let balancedProtection = false;
+  if (ranked.length >= 2) {
+    const gap = Math.abs(score[ranked[0]] - score[ranked[1]]);
+    if (gap < BALANCE_THRESHOLD) {
+      let hottest = COMBOS[0];
+      for (const c of COMBOS) if (cnt[c] > cnt[hottest]) hottest = c;
+      if (ranked[0] === hottest || ranked[1] === hottest) {
+        const idx = ranked.indexOf(hottest);
+        ranked.splice(idx, 1);
+        ranked.push(hottest);
+        balancedProtection = true;
+      }
     }
   }
 
-  // 4. 期望 & 95% 分位
-  const expected=new Array(4).fill(0);
-  const lower=new Array(4).fill(0);
-  const upper=new Array(4).fill(0);
-
-  for(let j=0;j<4;j++){
-    const col=new Float64Array(N_SIM);
-    let sum=0;
-    for(let i=0;i<N_SIM;i++){
-      col[i]=samples[i*4+j];
-      sum+=col[i];
-    }
-    expected[j]=sum/N_SIM;
-    col.sort();
-    lower[j]=col[Math.floor(N_SIM*0.025)];
-    upper[j]=col[Math.floor(N_SIM*0.975)];
-  }
-
-  const mcProbs=[0,0,0,0];
-  for(let j=0;j<4;j++)mcProbs[j]=mcHits[j]/N_SIM;
-
-  // 5. 防固化
-  let order=[0,1,2,3].sort((a,b)=>expected[b]-expected[a]);
-  const top1Raw=COMBOS[order[0]];
-  const h=state.top1History;
-  let fixationTriggered=false;
-  const expectedAdj=expected.slice();
-
-  if(h.length>=STICKY_PERIOD && h.slice(-STICKY_PERIOD).every(x=>x===top1Raw)){
-    expectedAdj[order[0]]-=STICKY_PENALTY;
-    order=[0,1,2,3].sort((a,b)=>expectedAdj[b]-expectedAdj[a]);
-    fixationTriggered=true;
-    console.log(`[防固化] ${top1Raw} 减 ${STICKY_PENALTY}`);
-  }
-  h.push(top1Raw);
-  if(h.length>20)h.shift();
-
-  // 6. 组装
-  const metrics={};
-  for(let i=0;i<4;i++){
-    metrics[COMBOS[i]]={
-      expected:expected[i],
-      lower:lower[i],
-      upper:upper[i],
-      mcProb:mcProbs[i],
+  // 10. metrics
+  const metrics = {};
+  for (const c of COMBOS) {
+    metrics[c] = {
+      P1: P1[c], P2: P2[c], H: H[c],
+      comp: comp[c], dev: dev[c],
+      score: score[c], cnt: cnt[c],
     };
   }
-  const rankedCombos=order.map(i=>COMBOS[i]);
 
-  return{
-    main:[rankedCombos[0],rankedCombos[1]],
-    defense:rankedCombos[2],
-    ranked:rankedCombos,
-    metrics:metrics,
-    fixationTriggered:fixationTriggered,
-    counts:counts,
+  return {
+    main: [ranked[0], ranked[1]],
+    defense: ranked[2],
+    ranked: ranked,
+    top1Raw: top1Raw,
+    metrics: metrics,
+    fixationTriggered: fixationTriggered,
+    balancedProtection: balancedProtection,
   };
 }
 
-function predict(seq){return runAlgorithm(seq);}
-
 /* ================================================================
-   历史重建(修复版)
+   历史重建
    ================================================================ */
 async function rebuildHistoryFromDraws(){
-  const allDraws=await dbGetAll('draws');
-  const MIN_WINDOW=20;
-  const n=allDraws.length;
-  if(n<MIN_WINDOW+1)return 0;
+  const allDraws = await dbGetAll('draws');
+  const MIN_WINDOW = 20;
+  const n = allDraws.length;
+  if (n < MIN_WINDOW + 1) return 0;
 
-  const asc=allDraws.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  const existing=await dbGetAll('preds');
-  const existingKeys=new Set(existing.map(p=>p.key));
+  const asc = allDraws.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  const existing = await dbGetAll('preds');
+  const existingKeys = new Set(existing.map(p => p.key));
 
-  const maxRebuild=Math.min(HISTORY_REBUILD_COUNT,n-MIN_WINDOW);
-  const startK=n-maxRebuild;
+  const maxRebuild = Math.min(HISTORY_REBUILD_COUNT, n - MIN_WINDOW);
+  const startK = n - maxRebuild;
 
-  const newPreds=[];
-  for(let k=startK;k<n;k++){
-    const predIssue=asc[k-1].issue;
-    if(existingKeys.has(predIssue))continue;
+  const localTop1 = [];
 
-    const windowStart=Math.max(0,k-WINDOW_SIZE);
-    const windowDraws=asc.slice(windowStart,k);
-    if(windowDraws.length<MIN_WINDOW)continue;
+  const newPreds = [];
+  for (let k = startK; k < n; k++) {
+    const predIssue = asc[k - 1].issue;
+    if (existingKeys.has(predIssue)) continue;
 
-    const seq=windowDraws.map(d=>d.combo);
-    const pred=predict(seq);
-    if(!pred)continue;
+    const windowStart = Math.max(0, k - WINDOW_SIZE);
+    const windowDraws = asc.slice(windowStart, k);
+    if (windowDraws.length < MIN_WINDOW) continue;
 
-    const actual=asc[k].combo;
-    const mainHit=pred.main.includes(actual)?1:0;
-    const defHit=(mainHit===0&&pred.defense===actual)?1:0;
+    const seq = windowDraws.map(d => d.combo);
+    const pred = runAlgorithm(seq, localTop1);
+    if (!pred) continue;
+
+    localTop1.push(pred.top1Raw);
+    if (localTop1.length > 20) localTop1.shift();
+
+    const actual = asc[k].combo;
+    const mainHit = pred.main.includes(actual) ? 1 : 0;
+    const defHit = (mainHit === 0 && pred.defense === actual) ? 1 : 0;
 
     newPreds.push({
-      key:predIssue,issue:predIssue,
-      predict_time:asc[k-1].draw_time,
-      main:pred.main,defense:pred.defense,
-      ranked:pred.ranked,metrics:pred.metrics,
-      actual:actual,main_hit:mainHit,def_hit:defHit,
-      historical:true,
+      key: predIssue, issue: predIssue,
+      predict_time: asc[k - 1].draw_time,
+      main: pred.main, defense: pred.defense,
+      ranked: pred.ranked,
+      metrics: pred.metrics,
+      actual: actual,
+      main_hit: mainHit, def_hit: defHit,
+      historical: true,
     });
   }
-  if(newPreds.length)await dbPutMany('preds',newPreds);
+  if (newPreds.length) await dbPutMany('preds', newPreds);
   console.log(`[历史重建] 可用 ${n} 期，新增 ${newPreds.length} 条`);
   return newPreds.length;
 }
@@ -656,55 +638,55 @@ async function rebuildHistoryFromDraws(){
    走势图
    ================================================================ */
 async function drawTrend(){
-  const tbody=document.getElementById('trendBody');
-  const allDraws=await dbGetAll('draws');
-  if(!allDraws.length){
-    tbody.innerHTML='<tr><td colspan="10" class="trend-empty">暂无数据...</td></tr>';
-    document.getElementById('trendSummary').innerHTML='';
+  const tbody = document.getElementById('trendBody');
+  const allDraws = await dbGetAll('draws');
+  if (!allDraws.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="trend-empty">暂无数据...</td></tr>';
+    document.getElementById('trendSummary').innerHTML = '';
     return;
   }
-  const draws=allDraws.slice().sort((a,b)=>(a.ts||0)-(b.ts||0)).slice(-TREND_MAX).reverse();
-  const html=draws.map((d,i)=>{
-    const isLatest=i===0;
-    const hideLatest=isLatest&&state.scratchActive;
-    if(hideLatest){
+  const draws = allDraws.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0)).slice(-TREND_MAX).reverse();
+  const html = draws.map((d, i) => {
+    const isLatest = i === 0;
+    const hideLatest = isLatest && state.scratchActive;
+    if (hideLatest) {
       return `<tr class="latest hidden">
         <td class="issue">${d.issue}</td>
         <td colspan="9"><span class="hidden-q">? ? ? 刮开查看</span></td>
       </tr>`;
     }
-    const isBig=d.sum_val>=14;
-    const isOdd=d.sum_val%2===1;
-    const combo=d.combo||(isBig?'大':'小')+(isOdd?'单':'双');
-    const comboCls=combo==='大双'||combo==='小双'?'tag-combo-big':'tag-combo-small';
-    return`<tr class="${isLatest?'latest':''}">
+    const isBig = d.sum_val >= 14;
+    const isOdd = d.sum_val % 2 === 1;
+    const combo = d.combo || ((isBig ? '大' : '小') + (isOdd ? '单' : '双'));
+    const comboCls = (combo === '大双' || combo === '小双') ? 'tag-combo-big' : 'tag-combo-small';
+    return `<tr class="${isLatest ? 'latest' : ''}">
       <td class="issue">${d.issue}</td>
-      <td class="val">${String(d.sum_val).padStart(2,'0')}</td>
-      <td>${isBig?'<span class="tag tag-big">大</span>':''}</td>
-      <td>${!isBig?'<span class="tag tag-small">小</span>':''}</td>
-      <td>${isOdd?'<span class="tag tag-odd">单</span>':''}</td>
-      <td>${!isOdd?'<span class="tag tag-even">双</span>':''}</td>
-      <td>${combo==='大单'?`<span class="tag ${comboCls}">大单</span>`:''}</td>
-      <td>${combo==='大双'?`<span class="tag ${comboCls}">大双</span>`:''}</td>
-      <td>${combo==='小单'?`<span class="tag ${comboCls}">小单</span>`:''}</td>
-      <td>${combo==='小双'?`<span class="tag ${comboCls}">小双</span>`:''}</td>
+      <td class="val">${String(d.sum_val).padStart(2, '0')}</td>
+      <td>${isBig ? '<span class="tag tag-big">大</span>' : ''}</td>
+      <td>${!isBig ? '<span class="tag tag-small">小</span>' : ''}</td>
+      <td>${isOdd ? '<span class="tag tag-odd">单</span>' : ''}</td>
+      <td>${!isOdd ? '<span class="tag tag-even">双</span>' : ''}</td>
+      <td>${combo === '大单' ? `<span class="tag ${comboCls}">大单</span>` : ''}</td>
+      <td>${combo === '大双' ? `<span class="tag ${comboCls}">大双</span>` : ''}</td>
+      <td>${combo === '小单' ? `<span class="tag ${comboCls}">小单</span>` : ''}</td>
+      <td>${combo === '小双' ? `<span class="tag ${comboCls}">小双</span>` : ''}</td>
     </tr>`;
   }).join('');
-  tbody.innerHTML=html;
+  tbody.innerHTML = html;
 
-  const visibleDraws=state.scratchActive?draws.slice(1):draws;
-  const counts={'大单':0,'大双':0,'小单':0,'小双':0};
-  visibleDraws.forEach(d=>{if(counts[d.combo]!=null)counts[d.combo]++;});
-  const total=visibleDraws.length||1;
-  const bigCount=visibleDraws.filter(d=>d.sum_val>=14).length;
-  const oddCount=visibleDraws.filter(d=>d.sum_val%2===1).length;
-  document.getElementById('trendSummary').innerHTML=`
+  const visibleDraws = state.scratchActive ? draws.slice(1) : draws;
+  const counts = {'大单':0,'大双':0,'小单':0,'小双':0};
+  visibleDraws.forEach(d => { if (counts[d.combo] != null) counts[d.combo]++; });
+  const total = visibleDraws.length || 1;
+  const bigCount = visibleDraws.filter(d => d.sum_val >= 14).length;
+  const oddCount = visibleDraws.filter(d => d.sum_val % 2 === 1).length;
+  document.getElementById('trendSummary').innerHTML = `
     <div><div class="sv" style="color:#b91c1c">${counts['大单']}</div><div class="sl">大单</div></div>
     <div><div class="sv" style="color:#c2410c">${counts['大双']}</div><div class="sl">大双</div></div>
     <div><div class="sv" style="color:#1d4ed8">${counts['小单']}</div><div class="sl">小单</div></div>
     <div><div class="sv" style="color:#0e7490">${counts['小双']}</div><div class="sl">小双</div></div>
-    <div><div class="sv">${(bigCount*100/total).toFixed(0)}%</div><div class="sl">大占比</div></div>
-    <div><div class="sv">${(oddCount*100/total).toFixed(0)}%</div><div class="sl">单占比</div></div>
+    <div><div class="sv">${(bigCount * 100 / total).toFixed(0)}%</div><div class="sl">大占比</div></div>
+    <div><div class="sv">${(oddCount * 100 / total).toFixed(0)}%</div><div class="sl">单占比</div></div>
   `;
 }
 
@@ -712,154 +694,169 @@ async function drawTrend(){
    刮奖
    ================================================================ */
 function initScratch(){
-  const canvas=document.getElementById('scratchCanvas');
-  const wrap=document.getElementById('scratchWrap');
+  const canvas = document.getElementById('scratchCanvas');
+  const wrap = document.getElementById('scratchWrap');
   canvas.classList.add('active');
-  const dpr=window.devicePixelRatio||1;
-  const w=wrap.offsetWidth,h=wrap.offsetHeight;
-  canvas.width=w*dpr;canvas.height=h*dpr;
-  canvas.style.width=w+'px';canvas.style.height=h+'px';
-  const ctx=canvas.getContext('2d');
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.scale(dpr,dpr);
-  const grad=ctx.createLinearGradient(0,0,w,h);
-  grad.addColorStop(0,'#cbd5e1');grad.addColorStop(0.5,'#94a3b8');grad.addColorStop(1,'#cbd5e1');
-  ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
-  ctx.fillStyle='#fff';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
-  ctx.fillText('👆 手指滑动刮开',w/2,h/2-4);
-  ctx.font='11px sans-serif';
-  ctx.fillText('揭晓最新一期开奖',w/2,h/2+14);
-  state.scratchActive=true;
+  const dpr = window.devicePixelRatio || 1;
+  const w = wrap.offsetWidth, h = wrap.offsetHeight;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.scale(dpr, dpr);
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#cbd5e1');
+  grad.addColorStop(0.5, '#94a3b8');
+  grad.addColorStop(1, '#cbd5e1');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('👆 手指滑动刮开', w / 2, h / 2 - 4);
+  ctx.font = '11px sans-serif';
+  ctx.fillText('揭晓最新一期开奖', w / 2, h / 2 + 14);
+  state.scratchActive = true;
   updateScratchBtn();
   drawTrend();
-  let drawing=false;
-  const erase=(x,y)=>{ctx.globalCompositeOperation='destination-out';ctx.beginPath();ctx.arc(x,y,22,0,Math.PI*2);ctx.fill();checkReveal();};
-  const getPos=e=>{const rect=canvas.getBoundingClientRect();const p=e.touches?e.touches[0]:e;return{x:p.clientX-rect.left,y:p.clientY-rect.top};};
-  canvas.onmousedown=canvas.ontouchstart=e=>{e.preventDefault();drawing=true;const{x,y}=getPos(e);erase(x,y);};
-  canvas.onmousemove=canvas.ontouchmove=e=>{if(!drawing)return;e.preventDefault();const{x,y}=getPos(e);erase(x,y);};
-  canvas.onmouseup=canvas.ontouchend=canvas.onmouseleave=canvas.ontouchcancel=()=>{drawing=false;};
+  let drawing = false;
+  const erase = (x, y) => {
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
+    checkReveal();
+  };
+  const getPos = e => {
+    const rect = canvas.getBoundingClientRect();
+    const p = e.touches ? e.touches[0] : e;
+    return { x: p.clientX - rect.left, y: p.clientY - rect.top };
+  };
+  canvas.onmousedown = canvas.ontouchstart = e => { e.preventDefault(); drawing = true; const {x,y} = getPos(e); erase(x,y); };
+  canvas.onmousemove = canvas.ontouchmove = e => { if (!drawing) return; e.preventDefault(); const {x,y} = getPos(e); erase(x,y); };
+  canvas.onmouseup = canvas.ontouchend = canvas.onmouseleave = canvas.ontouchcancel = () => { drawing = false; };
 }
 function checkReveal(){
-  const canvas=document.getElementById('scratchCanvas');
-  const ctx=canvas.getContext('2d');
-  try{
-    const img=ctx.getImageData(0,0,canvas.width,canvas.height).data;
-    let transparent=0,total=0;
-    for(let i=3;i<img.length;i+=16){total++;if(img[i]<100)transparent++;}
-    if(transparent/total>0.6&&state.scratchActive)revealAll();
-  }catch(e){}
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+  try {
+    const img = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let transparent = 0, total = 0;
+    for (let i = 3; i < img.length; i += 16) { total++; if (img[i] < 100) transparent++; }
+    if (transparent / total > 0.6 && state.scratchActive) revealAll();
+  } catch (e) {}
 }
 function revealAll(){
-  const canvas=document.getElementById('scratchCanvas');
-  const ctx=canvas.getContext('2d');
-  ctx.setTransform(1,0,0,1,0,0);
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   canvas.classList.remove('active');
-  if(state.scratchActive){state.scratchActive=false;updateScratchBtn();drawTrend();}
+  if (state.scratchActive) { state.scratchActive = false; updateScratchBtn(); drawTrend(); }
 }
-function toggleScratch(){if(state.scratchActive)revealAll();else initScratch();}
-function updateScratchBtn(){document.getElementById('scratchBtn').textContent=state.scratchActive?'👁 揭晓':'🎯 刮奖';}
+function toggleScratch(){ if (state.scratchActive) revealAll(); else initScratch(); }
+function updateScratchBtn(){ document.getElementById('scratchBtn').textContent = state.scratchActive ? '👁 揭晓' : '🎯 刮奖'; }
 
 /* ================================================================
    复制
    ================================================================ */
 function copyPrediction(){
-  if(!state.currentPred){setStatus('暂无预测可复制','warn');return;}
-  const main=state.currentPred.main.join('·');
-  const def=state.currentPred.defense||'无';
-  const text=`主攻：${main} | 防守：${def}`;
-  const onSuccess=()=>{
-    const btn=document.getElementById('copyBtn');
-    const orig=btn.textContent;
-    btn.textContent='✅ 已复制';
-    btn.style.animation='copied .4s';
-    setStatus('已复制：'+text,'ok');
-    setTimeout(()=>{btn.textContent=orig;btn.style.animation='';},1500);
+  if (!state.currentPred) { setStatus('暂无预测可复制', 'warn'); return; }
+  const main = state.currentPred.main.join('·');
+  const def = state.currentPred.defense || '无';
+  const text = `主攻：${main} | 防守：${def}`;
+  const onSuccess = () => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已复制';
+    btn.style.animation = 'copied .4s';
+    setStatus('已复制：' + text, 'ok');
+    setTimeout(() => { btn.textContent = orig; btn.style.animation = ''; }, 1500);
   };
-  const onFail=(e)=>{setStatus('复制失败，请长按选择','warn');console.warn(e);};
-  if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(text).then(onSuccess).catch(()=>{fallbackCopy(text)?onSuccess():onFail('fallback failed');});
-  }else{fallbackCopy(text)?onSuccess():onFail('no clipboard');}
+  const onFail = (e) => { setStatus('复制失败，请长按选择', 'warn'); console.warn(e); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => { fallbackCopy(text) ? onSuccess() : onFail('fallback failed'); });
+  } else { fallbackCopy(text) ? onSuccess() : onFail('no clipboard'); }
 }
 function fallbackCopy(text){
-  const ta=document.createElement('textarea');
-  ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';ta.style.top='0';
-  ta.setAttribute('readonly','');
-  document.body.appendChild(ta);ta.select();ta.setSelectionRange(0,text.length);
-  let ok=false;try{ok=document.execCommand('copy');}catch(e){}
-  document.body.removeChild(ta);return ok;
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px'; ta.style.top = '0';
+  ta.setAttribute('readonly', '');
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta); return ok;
 }
 
 /* ================================================================
    主循环
    ================================================================ */
 async function tick(){
-  try{
-    setStatus('拉取数据...','warn');
-    const draws=await fetchDraws();
-    if(!draws.length){setStatus('接口无数据','warn');return;}
+  try {
+    setStatus('拉取数据...', 'warn');
+    const draws = await fetchDraws();
+    if (!draws.length) { setStatus('接口无数据', 'warn'); return; }
 
-    await dbPutMany('draws',draws);
-    state.periodMs=detectPeriod(draws);
+    await dbPutMany('draws', draws);
+    state.periodMs = detectPeriod(draws);
 
-    const latest=draws[0];
-    state.latestDraw=latest;
+    const latest = draws[0];
+    state.latestDraw = latest;
     setLatest(latest);
     updateNextDrawTs(latest);
 
-    if(!state.historyRebuilt){
-      state.historyRebuilt=true;
-      setStatus('重建历史记录...','warn');
-      const added=await rebuildHistoryFromDraws();
-      if(added>0)setStatus(`重建历史 ${added} 期`,'ok');
+    if (!state.historyRebuilt) {
+      state.historyRebuilt = true;
+      setStatus('重建历史记录...', 'warn');
+      const added = await rebuildHistoryFromDraws();
+      if (added > 0) setStatus(`重建历史 ${added} 期`, 'ok');
     }
 
     await drawTrend();
 
-    if(latest.issue===state.lastIssue){setStatus(`无新期(${latest.issue})`,'ok');return;}
-    state.lastIssue=latest.issue;
+    if (latest.issue === state.lastIssue) { setStatus(`无新期（${latest.issue}）`, 'ok'); return; }
+    state.lastIssue = latest.issue;
     state.cycleCount++;
 
-    const all=await dbGetAll('draws');
-    all.sort((a,b)=>(a.ts||0)-(b.ts||0));
-    const seqAll=all.map(d=>d.combo);
+    const all = await dbGetAll('draws');
+    all.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    const seqAll = all.map(d => d.combo);
 
-    const recent=seqAll.slice(-WINDOW_SIZE);
-    setStatus(`蒙特卡洛模拟 ${N_SIM/1000}k 次...`,'warn');
-    const pred=predict(recent);
-    if(!pred){setStatus('分析失败','bad');return;}
-    state.currentPred=pred;
+    const recent = seqAll.slice(-WINDOW_SIZE);
+    const pred = runAlgorithm(recent, state.top1History);
+    if (!pred) { setStatus('分析失败', 'bad'); return; }
+    state.currentPred = pred;
     renderPrediction(pred);
 
-    await dbPut('preds',{
-      key:latest.issue,issue:latest.issue,
-      predict_time:latest.draw_time,
-      main:pred.main,defense:pred.defense,
-      ranked:pred.ranked,metrics:pred.metrics,
-      actual:null,main_hit:null,def_hit:null,historical:false,
+    state.top1History.push(pred.top1Raw);
+    if (state.top1History.length > 20) state.top1History.shift();
+
+    await dbPut('preds', {
+      key: latest.issue, issue: latest.issue,
+      predict_time: latest.draw_time,
+      main: pred.main, defense: pred.defense,
+      ranked: pred.ranked, metrics: pred.metrics,
+      actual: null, main_hit: null, def_hit: null, historical: false,
     });
 
-    await backfill(seqAll,draws);
+    await backfill(seqAll, draws);
     await refreshHistory();
 
-    setStatus(`完成(第 ${state.cycleCount} 轮)`,'ok');
-  }catch(e){
-    console.error(e);setStatus('出错：'+e.message,'bad');
+    setStatus(`完成（第 ${state.cycleCount} 轮）`, 'ok');
+  } catch (e) {
+    console.error(e);
+    setStatus('出错：' + e.message, 'bad');
   }
 }
 
-async function backfill(seqAll,draws){
-  const allPreds=await dbGetAll('preds');
-  const predMap={};allPreds.forEach(p=>predMap[p.issue]=p);
-  const asc=draws.slice().sort((a,b)=>a.ts-b.ts);
-  const nextCombo={};
-  for(let i=0;i<asc.length-1;i++){nextCombo[asc[i].issue]=asc[i+1].combo;}
-  for(const[issue,p]of Object.entries(predMap)){
-    if(p.actual)continue;
-    const actual=nextCombo[issue];if(!actual)continue;
-    p.actual=actual;p.main_hit=p.main.includes(actual)?1:0;
-    p.def_hit=(p.main_hit===0&&p.defense===actual)?1:0;
-    await dbPut('preds',p);
+async function backfill(seqAll, draws){
+  const allPreds = await dbGetAll('preds');
+  const predMap = {}; allPreds.forEach(p => predMap[p.issue] = p);
+  const asc = draws.slice().sort((a, b) => a.ts - b.ts);
+  const nextCombo = {};
+  for (let i = 0; i < asc.length - 1; i++) nextCombo[asc[i].issue] = asc[i + 1].combo;
+  for (const [issue, p] of Object.entries(predMap)) {
+    if (p.actual) continue;
+    const actual = nextCombo[issue]; if (!actual) continue;
+    p.actual = actual;
+    const main = typeof p.main === 'string' ? p.main.split(',') : p.main;
+    p.main_hit = main.includes(actual) ? 1 : 0;
+    p.def_hit = (p.main_hit === 0 && p.defense === actual) ? 1 : 0;
+    await dbPut('preds', p);
   }
 }
 
@@ -867,85 +864,85 @@ async function backfill(seqAll,draws){
    对错表
    ================================================================ */
 async function refreshHistory(){
-  const preds=await dbGetAll('preds');
-  const allDraws=await dbGetAll('draws');
+  const preds = await dbGetAll('preds');
+  const allDraws = await dbGetAll('draws');
 
-  const ascDraws=allDraws.slice().sort((a,b)=>(a.ts||0)-(b.ts||0));
-  const issueToNext={};
-  for(let i=0;i<ascDraws.length-1;i++){issueToNext[ascDraws[i].issue]=ascDraws[i+1];}
+  const ascDraws = allDraws.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0));
+  const issueToNext = {};
+  for (let i = 0; i < ascDraws.length - 1; i++) issueToNext[ascDraws[i].issue] = ascDraws[i + 1];
 
-  const filled=preds.filter(p=>p.actual)
-    .sort((a,b)=>(b.issue||'').localeCompare(a.issue||''))
-    .slice(0,HISTORY_REBUILD_COUNT);
+  const filled = preds.filter(p => p.actual)
+    .sort((a, b) => (b.issue || '').localeCompare(a.issue || ''))
+    .slice(0, HISTORY_REBUILD_COUNT);
 
-  state.lastHistory=filled;
+  state.lastHistory = filled;
 
-  const total=filled.length;
-  const mainHits=filled.filter(p=>p.main_hit).length;
-  const defHits=filled.filter(p=>p.def_hit).length;
-  const empty=total-mainHits-defHits;
-  document.getElementById('summaryBox').innerHTML=`
+  const total = filled.length;
+  const mainHits = filled.filter(p => p.main_hit).length;
+  const defHits = filled.filter(p => p.def_hit).length;
+  const empty = total - mainHits - defHits;
+  document.getElementById('summaryBox').innerHTML = `
     <div><div class="sv">${total}</div><div class="sl">总期数</div></div>
     <div><div class="sv" style="color:#059669">${mainHits}</div><div class="sl">主推命中</div></div>
     <div><div class="sv" style="color:#d97706">${defHits}</div><div class="sl">防守命中</div></div>
     <div><div class="sv" style="color:#dc2626">${empty}</div><div class="sl">全空</div></div>
-    <div><div class="sv">${total?(mainHits*100/total).toFixed(1):0}%</div><div class="sl">主推率</div></div>
+    <div><div class="sv">${total ? (mainHits * 100 / total).toFixed(1) : 0}%</div><div class="sl">主推率</div></div>
   `;
 
-  const patternCounts={豹子:0,顺子:0,对子:0,杂六:0};
-  let validCount=0;
-  for(const p of filled){
-    const nextDraw=issueToNext[p.issue];
-    if(nextDraw){
-      const pat=detectPattern(nextDraw.num_a,nextDraw.num_b,nextDraw.num_c);
+  const patternCounts = {豹子:0, 顺子:0, 对子:0, 杂六:0};
+  let validCount = 0;
+  for (const p of filled) {
+    const nextDraw = issueToNext[p.issue];
+    if (nextDraw) {
+      const pat = detectPattern(nextDraw.num_a, nextDraw.num_b, nextDraw.num_c);
       patternCounts[pat]++;
       validCount++;
     }
   }
-  const vc=validCount||1;
-  document.getElementById('patternStats').innerHTML=`
-    <div class="pattern-stat-item"><span class="pattern-tag pt-baozi">豹子</span><span class="pattern-stat-val">${patternCounts.豹子}</span><span class="pattern-stat-lbl" style="color:#6d28d9">${(patternCounts.豹子*100/vc).toFixed(0)}%</span></div>
-    <div class="pattern-stat-item"><span class="pattern-tag pt-shunzi">顺子</span><span class="pattern-stat-val">${patternCounts.顺子}</span><span class="pattern-stat-lbl" style="color:#0e7490">${(patternCounts.顺子*100/vc).toFixed(0)}%</span></div>
-    <div class="pattern-stat-item"><span class="pattern-tag pt-duizi">对子</span><span class="pattern-stat-val">${patternCounts.对子}</span><span class="pattern-stat-lbl" style="color:#b45309">${(patternCounts.对子*100/vc).toFixed(0)}%</span></div>
-    <div class="pattern-stat-item"><span class="pattern-tag pt-zaliu">杂六</span><span class="pattern-stat-val">${patternCounts.杂六}</span><span class="pattern-stat-lbl" style="color:#64748b">${(patternCounts.杂六*100/vc).toFixed(0)}%</span></div>
+  const vc = validCount || 1;
+  document.getElementById('patternStats').innerHTML = `
+    <div class="pattern-stat-item"><span class="pattern-tag pt-baozi">豹子</span><span class="pattern-stat-val">${patternCounts.豹子}</span><span class="pattern-stat-lbl" style="color:#6d28d9">${(patternCounts.豹子 * 100 / vc).toFixed(0)}%</span></div>
+    <div class="pattern-stat-item"><span class="pattern-tag pt-shunzi">顺子</span><span class="pattern-stat-val">${patternCounts.顺子}</span><span class="pattern-stat-lbl" style="color:#0e7490">${(patternCounts.顺子 * 100 / vc).toFixed(0)}%</span></div>
+    <div class="pattern-stat-item"><span class="pattern-tag pt-duizi">对子</span><span class="pattern-stat-val">${patternCounts.对子}</span><span class="pattern-stat-lbl" style="color:#b45309">${(patternCounts.对子 * 100 / vc).toFixed(0)}%</span></div>
+    <div class="pattern-stat-item"><span class="pattern-tag pt-zaliu">杂六</span><span class="pattern-stat-val">${patternCounts.杂六}</span><span class="pattern-stat-lbl" style="color:#64748b">${(patternCounts.杂六 * 100 / vc).toFixed(0)}%</span></div>
   `;
 
   renderHistoryPage(filled, issueToNext);
 }
 
 function renderHistoryPage(filled, issueToNext){
-  const total=filled.length;
-  const totalPages=Math.max(1, Math.ceil(total/HISTORY_PER_PAGE));
-  if(state.historyPage>=totalPages)state.historyPage=totalPages-1;
-  if(state.historyPage<0)state.historyPage=0;
+  const total = filled.length;
+  const totalPages = Math.max(1, Math.ceil(total / HISTORY_PER_PAGE));
+  if (state.historyPage >= totalPages) state.historyPage = totalPages - 1;
+  if (state.historyPage < 0) state.historyPage = 0;
 
-  const startIdx=state.historyPage*HISTORY_PER_PAGE;
-  const pageItems=filled.slice(startIdx, startIdx+HISTORY_PER_PAGE);
+  const startIdx = state.historyPage * HISTORY_PER_PAGE;
+  const pageItems = filled.slice(startIdx, startIdx + HISTORY_PER_PAGE);
 
-  const tbody=document.querySelector('#historyTable tbody');
-  tbody.innerHTML='';
-  if(pageItems.length===0){
-    tbody.innerHTML='<tr><td colspan="6" style="padding:20px;color:var(--text-dim);text-align:center">暂无数据</td></tr>';
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = '';
+  if (pageItems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="padding:20px;color:var(--text-dim);text-align:center">暂无数据</td></tr>';
   } else {
-    for(const p of pageItems){
-      const tr=document.createElement('tr');
-      let mark,cls;
-      if(p.main_hit){mark='主推🀄✅';cls='hit';}
-      else if(p.def_hit){mark='防守🀄✅';cls='hit';}
-      else{mark='🌸🈳';cls='miss';}
+    for (const p of pageItems) {
+      const tr = document.createElement('tr');
+      let mark, cls;
+      if (p.main_hit) { mark = '主推🀄✅'; cls = 'hit'; }
+      else if (p.def_hit) { mark = '防守🀄✅'; cls = 'hit'; }
+      else { mark = '🌸🈳'; cls = 'miss'; }
 
-      const nextDraw=issueToNext[p.issue];
-      let issueShow='?',timeShow='',numsShow='?',pattern='-',combo='-',comboCls='';
-      if(nextDraw){
-        issueShow=nextDraw.issue;
-        const m=(nextDraw.draw_time||'').match(/(\d{2}:\d{2}:\d{2})/);
-        timeShow=m?m[1]:'';
-        numsShow=`${nextDraw.num_a}+${nextDraw.num_b}+${nextDraw.num_c}=${nextDraw.sum_val}`;
-        combo=nextDraw.combo;
-        comboCls=comboClass(combo);
-        pattern=detectPattern(nextDraw.num_a,nextDraw.num_b,nextDraw.num_c);
+      const nextDraw = issueToNext[p.issue];
+      let issueShow = '?', timeShow = '', numsShow = '?', pattern = '-', combo = '-', comboCls = '';
+      if (nextDraw) {
+        issueShow = nextDraw.issue;
+        const m = (nextDraw.draw_time || '').match(/(\d{2}:\d{2}:\d{2})/);
+        timeShow = m ? m[1] : '';
+        numsShow = `${nextDraw.num_a}+${nextDraw.num_b}+${nextDraw.num_c}=${nextDraw.sum_val}`;
+        combo = nextDraw.combo;
+        comboCls = comboClass(combo);
+        pattern = detectPattern(nextDraw.num_a, nextDraw.num_b, nextDraw.num_c);
       }
-      tr.innerHTML=`
+      tr.innerHTML = `
         <td class="issue-cell">${issueShow}</td>
         <td class="time-cell">${timeShow}</td>
         <td class="nums-cell">${numsShow}</td>
@@ -957,90 +954,94 @@ function renderHistoryPage(filled, issueToNext){
     }
   }
 
-  document.getElementById('pagerCur').textContent=state.historyPage+1;
-  document.getElementById('pagerTotal').textContent=totalPages;
-  document.getElementById('prevPageBtn').disabled=(state.historyPage<=0);
-  document.getElementById('nextPageBtn').disabled=(state.historyPage>=totalPages-1);
+  document.getElementById('pagerCur').textContent = state.historyPage + 1;
+  document.getElementById('pagerTotal').textContent = totalPages;
+  document.getElementById('prevPageBtn').disabled = (state.historyPage <= 0);
+  document.getElementById('nextPageBtn').disabled = (state.historyPage >= totalPages - 1);
 }
-function historyPrevPage(){if(state.historyPage>0){state.historyPage--;refreshHistory();}}
+function historyPrevPage(){ if (state.historyPage > 0) { state.historyPage--; refreshHistory(); } }
 function historyNextPage(){
-  const totalPages=Math.ceil(state.lastHistory.length/HISTORY_PER_PAGE);
-  if(state.historyPage<totalPages-1){state.historyPage++;refreshHistory();}
+  const totalPages = Math.ceil(state.lastHistory.length / HISTORY_PER_PAGE);
+  if (state.historyPage < totalPages - 1) { state.historyPage++; refreshHistory(); }
 }
 
 /* ================================================================
    UI
    ================================================================ */
-function setStatus(msg,type){
-  const el=document.getElementById('statusText');
-  el.textContent=msg;el.className=type==='ok'?'hit':type==='bad'?'miss':'warn';
+function setStatus(msg, type){
+  const el = document.getElementById('statusText');
+  el.textContent = msg;
+  el.className = type === 'ok' ? 'hit' : type === 'bad' ? 'miss' : 'warn';
 }
 function setLatest(d){
-  document.getElementById('latestIssue').textContent=d.issue;
-  document.getElementById('latestHeader').innerHTML=
+  document.getElementById('latestIssue').textContent = d.issue;
+  document.getElementById('latestHeader').innerHTML =
     `<b>第${d.issue}期</b><span class="meta-time">${formatDateTime(d.draw_time)}</span>`;
-  document.getElementById('lrA').textContent=d.num_a;
-  document.getElementById('lrB').textContent=d.num_b;
-  document.getElementById('lrC').textContent=d.num_c;
-  document.getElementById('lrSum').textContent=d.sum_val;
-  const isBig=d.sum_val>=14;
-  document.getElementById('lrSize').textContent=isBig?'大':'小';
-  document.getElementById('lrSize').className='size-box '+(isBig?'size-big':'size-small');
-  const isOdd=d.sum_val%2===1;
-  document.getElementById('lrParity').textContent=isOdd?'单':'双';
-  document.getElementById('lrParity').className='size-box '+(isOdd?'parity-odd':'parity-even');
+  document.getElementById('lrA').textContent = d.num_a;
+  document.getElementById('lrB').textContent = d.num_b;
+  document.getElementById('lrC').textContent = d.num_c;
+  document.getElementById('lrSum').textContent = d.sum_val;
+  const isBig = d.sum_val >= 14;
+  document.getElementById('lrSize').textContent = isBig ? '大' : '小';
+  document.getElementById('lrSize').className = 'size-box ' + (isBig ? 'size-big' : 'size-small');
+  const isOdd = d.sum_val % 2 === 1;
+  document.getElementById('lrParity').textContent = isOdd ? '单' : '双';
+  document.getElementById('lrParity').className = 'size-box ' + (isOdd ? 'parity-odd' : 'parity-even');
 }
 
 function renderPrediction(pred){
-  document.getElementById('predLine').innerHTML=
-    `<span class="item"><span class="lbl">主攻：</span><span class="main-val">${pred.main.join('·')}</span></span>`+
-    `<span class="item"><span class="lbl">防守：</span><span class="def-val">${pred.defense||'无'}</span></span>`;
+  document.getElementById('predLine').innerHTML =
+    `<span class="item"><span class="lbl">主攻：</span><span class="main-val">${pred.main.join('·')}</span></span>` +
+    `<span class="item"><span class="lbl">防守：</span><span class="def-val">${pred.defense || '无'}</span></span>`;
 
-  const fixEl=document.getElementById('fixationMsg');
-  fixEl.textContent=pred.fixationTriggered?`⚠️ 防固化：Top1 减 ${STICKY_PENALTY}`:'';
-  fixEl.className=pred.fixationTriggered?'warn':'';
+  const fixEl = document.getElementById('fixationMsg');
+  const msgs = [];
+  if (pred.fixationTriggered) msgs.push(`⚠️ 防固化：Top1 扣 ${STICKY_PENALTY} 分`);
+  if (pred.balancedProtection) msgs.push(`⚖️ 均衡保护：踢出最热`);
+  fixEl.textContent = msgs.join('  |  ');
+  fixEl.className = msgs.length ? 'warn' : '';
 
-  // ★ 贝叶斯明细表
-  const tbody=document.querySelector('#metricsTable tbody');
-  tbody.innerHTML='';
-  pred.ranked.forEach((c,idx)=>{
-    const m=pred.metrics[c];
-    const tr=document.createElement('tr');
-    if(idx<2)tr.style.background='#ecfdf5';
-    else if(idx===2)tr.style.background='#fffbeb';
-    const pct=v=>(v*100).toFixed(1)+'%';
-    tr.innerHTML=`
+  const tbody = document.querySelector('#metricsTable tbody');
+  tbody.innerHTML = '';
+  pred.ranked.forEach((c, idx) => {
+    const m = pred.metrics[c];
+    const tr = document.createElement('tr');
+    if (idx < 2) tr.style.background = '#ecfdf5';
+    else if (idx === 2) tr.style.background = '#fffbeb';
+    tr.innerHTML = `
       <td><b>${c}</b></td>
-      <td class="num">${pct(m.expected)}</td>
-      <td class="num" style="color:#8b96a8">${pct(m.lower)}</td>
-      <td class="num" style="color:#8b96a8">${pct(m.upper)}</td>
-      <td class="num">${pct(m.mcProb)}</td>
-      <td>[${idx+1}]</td>
+      <td class="num" style="font-size:10px">${(m.P1*100).toFixed(1)}%</td>
+      <td class="num" style="font-size:10px">${(m.P2*100).toFixed(1)}%</td>
+      <td class="num" style="font-size:10px">${(m.H*100).toFixed(0)}%</td>
+      <td class="num" style="font-size:10px;color:${m.comp>=0?'#059669':'#dc2626'};font-weight:800">${m.comp>=0?'+':''}${m.comp.toFixed(0)}</td>
+      <td class="num" style="font-size:10px;color:#8b96a8">${m.dev.toFixed(0)}</td>
+      <td class="num" style="font-weight:800;color:#4f46e5">${m.score.toFixed(1)}</td>
+      <td>[${idx + 1}]</td>
     `;
     tbody.appendChild(tr);
   });
 
-  // ★ 4 个组合卡片
-  const boxes=document.getElementById('metricBoxes');
-  boxes.innerHTML='';
-  pred.ranked.forEach((c,idx)=>{
-    const m=pred.metrics[c];
-    const div=document.createElement('div');
-    div.className='metric-box'+(idx===0?' rank1':idx===1?' rank2':'');
-    const ci=(m.upper-m.lower);
-    div.innerHTML=`
-      <div class="mv">${(m.expected*100).toFixed(1)}%</div>
-      <div class="ml">${c}${idx===0?' ·主推1':idx===1?' ·主推2':idx===2?' ·防守':''}</div>
-      <div class="mci">CI±${(ci*50).toFixed(1)}%</div>
+  const boxes = document.getElementById('metricBoxes');
+  boxes.innerHTML = '';
+  pred.ranked.forEach((c, idx) => {
+    const m = pred.metrics[c];
+    const div = document.createElement('div');
+    div.className = 'metric-box' + (idx === 0 ? ' rank1' : idx === 1 ? ' rank2' : '');
+    const tag = idx === 0 ? '主推1' : idx === 1 ? '主推2' : idx === 2 ? '防守' : '候选';
+    const compSign = m.comp >= 0 ? '+' : '';
+    div.innerHTML = `
+      <div class="mv">${m.score.toFixed(1)}</div>
+      <div class="ml">${c} · ${tag}</div>
+      <div class="mci">comp ${compSign}${m.comp.toFixed(0)} | cnt ${m.cnt}</div>
     `;
     boxes.appendChild(div);
   });
 }
 
 function switchTab(name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.tab===name));
-  document.querySelectorAll('.tab-content').forEach(t=>t.classList.toggle('active',t.id==='tab-'+name));
-  if(name==='trend')setTimeout(drawTrend,50);
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+  if (name === 'trend') setTimeout(drawTrend, 50);
 }
 
 /* ================================================================
@@ -1052,13 +1053,13 @@ async function boot(){
   await refreshHistory();
   await tick();
   startCountdownLoop();
-  setInterval(tick,POLL_INTERVAL);
-  document.addEventListener('visibilitychange',()=>{
-    if(document.visibilityState==='visible')tick();
+  setInterval(tick, POLL_INTERVAL);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') tick();
   });
-  window.addEventListener('resize',()=>{
+  window.addEventListener('resize', () => {
     drawTrend();
-    if(state.scratchActive)initScratch();
+    if (state.scratchActive) initScratch();
   });
 }
 boot();
