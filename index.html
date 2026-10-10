@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 v11c 精准自适应平衡</title>
+<title>PC28 v11d 新算法版</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -149,7 +149,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 v11c 精准自适应平衡 <span class="k-badge" id="kDisplay">趋势+补偿 v11c</span></h1>
+  <h1><span class="logo-dot"></span>PC28 v11d 新算法版 <span class="k-badge" id="kDisplay">新算法 v11d</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -231,16 +231,16 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细（趋势 50% + 补偿 50%）</h2>
+    <h2>综合得分明细</h2>
     <table id="metricsTable">
       <thead>
         <tr>
           <th>组合</th>
-          <th>P1<br>一阶</th>
-          <th>P2<br>二阶</th>
-          <th>H<br>活跃</th>
-          <th>补偿<br>comp</th>
-          <th>偏离<br>dev</th>
+          <th>趋势 T</th>
+          <th>遗漏 O</th>
+          <th>均衡 B</th>
+          <th>偏离 D</th>
+          <th>固化 F</th>
           <th>总分</th>
           <th>排名</th>
         </tr>
@@ -249,12 +249,12 @@ th{color:var(--text-dim);font-weight:600}
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
       <b style="color:var(--text-2)">公式：</b><br>
-      Score = 0.5 × (0.5×P1 + 0.3×P2 + 0.2×H) × 100 + 0.5 × compensation − 0.3 × deviation<br>
-      • <b>P1</b>：一阶条件概率 P(下期|上期)<br>
-      • <b>P2</b>：二阶条件概率 P(下期|上上期,上期)<br>
-      • <b>H</b>：最近 10 期频率<br>
-      • <b>comp</b>：相对遗漏分（tanh），范围 [-100, +100]<br>
-      • <b>dev</b>：频率偏离 25% 的百分比
+      Score = 0.45×趋势T + 0.20×遗漏O + 0.15×均衡B − 0.10×偏离D − 0.10×固化F<br>
+      • <b>T</b>：0.50×一阶转移 + 0.20×二阶转移 + 0.30×指数加权活跃度<br>
+      • <b>O</b>：相对遗漏（tanh 压制），冷门获得加分<br>
+      • <b>B</b>：低于 25% 基线获得正分<br>
+      • <b>D</b>：偏离 25% 越远扣得越多<br>
+      • <b>F</b>：Top1 连续相同时扣分
     </div>
   </div>
   <div class="card">
@@ -293,7 +293,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <script>
 /* ================================================================
-   配置
+   全局配置
    ================================================================ */
 const APIS = [
   { url: 'https://yu28.top/api/kj?nbr=100', headers: { 'X-Api-Key': 'yu28_6e21b2467d66f604' } },
@@ -302,13 +302,172 @@ const APIS = [
 const COMBOS = ['大双', '大单', '小双', '小单'];
 const WINDOW_SIZE = 60;
 const POLL_INTERVAL = 60000;
-const STICKY_PERIOD = 4;
-const STICKY_PENALTY = 15;
-const BALANCE_THRESHOLD = 5;
 const DEFAULT_PERIOD_MS = 210 * 1000;
 const TREND_MAX = 100;
 const HISTORY_REBUILD_COUNT = 50;
 const HISTORY_PER_PAGE = 25;
+
+/* ================================================================
+   ★★★ 核心算法（新算法版）★★★
+   ================================================================ */
+'use strict';
+
+function runAlgorithm(seq, top1History) {
+  const COMBOS = ['大双', '大单', '小双', '小单'];
+  const VALID = new Set(COMBOS);
+
+  const ALPHA = 2;
+  const BASELINE = 0.25;
+  const PROB_SCALE = 0.15;
+  const DECAY = 0.8;
+
+  const MAX_WINDOW = 200;
+  const EW_WINDOW = 10;
+  const HISTORY_WINDOW = 20;
+
+  const inputSeq = Array.isArray(seq) ? seq : [];
+  const cleanSeq = inputSeq.filter(value => VALID.has(value)).slice(-MAX_WINDOW);
+  const N = cleanSeq.length;
+
+  const hist = Array.isArray(top1History) ? top1History.slice(-HISTORY_WINDOW) : [];
+
+  const counts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
+  const lastPos = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
+
+  for (let i = 0; i < N; i += 1) {
+    const combo = cleanSeq[i];
+    counts[combo] += 1;
+    lastPos[combo] = i + 1;
+  }
+
+  const firstCounts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
+  let firstTotal = 0;
+  const latest = N > 0 ? cleanSeq[N - 1] : null;
+
+  for (let t = 0; t < N - 1; t += 1) {
+    if (cleanSeq[t] === latest) {
+      const nextCombo = cleanSeq[t + 1];
+      firstCounts[nextCombo] += 1;
+      firstTotal += 1;
+    }
+  }
+
+  const secondCounts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
+  let secondTotal = 0;
+
+  if (N >= 2) {
+    const latestPrev = cleanSeq[N - 2];
+    for (let t = 1; t < N - 1; t += 1) {
+      const matchesState = cleanSeq[t - 1] === latestPrev && cleanSeq[t] === latest;
+      if (matchesState) {
+        const nextCombo = cleanSeq[t + 1];
+        secondCounts[nextCombo] += 1;
+        secondTotal += 1;
+      }
+    }
+  }
+
+  const L = Math.min(N, EW_WINDOW);
+  const weightedCounts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
+  let weightTotal = 0;
+
+  for (let t = 0; t < L; t += 1) {
+    const weight = Math.pow(DECAY, t);
+    const combo = cleanSeq[N - 1 - t];
+    weightedCounts[combo] += weight;
+    weightTotal += weight;
+  }
+
+  let fixationCombo = null;
+  let fixationRun = 0;
+
+  if (hist.length > 0) {
+    const lastHistoryValue = hist[hist.length - 1];
+    if (VALID.has(lastHistoryValue)) {
+      fixationCombo = lastHistoryValue;
+      for (let i = hist.length - 1; i >= 0 && hist[i] === fixationCombo; i -= 1) {
+        fixationRun += 1;
+      }
+    }
+  }
+
+  function z(probability) {
+    return Math.tanh((probability - BASELINE) / PROB_SCALE);
+  }
+
+  const details = COMBOS.map((combo, index) => {
+    const count = counts[combo];
+
+    const p = (count + ALPHA) / (N + 4 * ALPHA);
+    const p1 = (firstCounts[combo] + ALPHA) / (firstTotal + 4 * ALPHA);
+    const p2 = (secondCounts[combo] + ALPHA) / (secondTotal + 4 * ALPHA);
+    const e = (weightedCounts[combo] + ALPHA) / (weightTotal + 4 * ALPHA);
+
+    const z1 = z(p1);
+    const z2 = z(p2);
+    const ze = z(e);
+
+    const trend = 100 * (0.50 * z1 + 0.20 * z2 + 0.30 * ze);
+
+    const gap = count === 0 ? N + 1 : N - lastPos[combo];
+    const theoreticalGap = (N + 1) / (count + 1);
+    const omission = 100 * Math.tanh((gap - theoreticalGap) / (1.5 * theoreticalGap));
+
+    const balance = 100 * Math.tanh((BASELINE - p) / PROB_SCALE);
+    const deviation = 100 * Math.tanh(Math.abs(p - BASELINE) / PROB_SCALE);
+
+    const fixationK = combo === fixationCombo ? fixationRun : 0;
+    const fixation = 100 * (1 - Math.exp(-fixationK / 3));
+
+    const score = 0.45 * trend + 0.20 * omission + 0.15 * balance - 0.10 * deviation - 0.10 * fixation;
+    const finiteScore = Number.isFinite(score) ? score : 0;
+
+    return {
+      combo, index,
+      score: finiteScore,
+      trend, omission, balance, deviation, fixation,
+      count,
+    };
+  });
+
+  details.sort((a, b) => {
+    if (b.score !== a.score) return b.score - a.score;
+    return a.index - b.index;
+  });
+
+  const ranked = details.map(item => item.combo);
+  const top1Raw = ranked[0];
+
+  const fixationTriggered = details.some(item => item.fixation > 0);
+  const balancedProtection = details.some(item => item.balance > 0);
+
+  const metrics = {};
+  for (const combo of COMBOS) {
+    const item = details.find(x => x.combo === combo);
+    metrics[combo] = {
+      score: item.score,
+      trend: item.trend,
+      omission: item.omission,
+      balance: item.balance,
+      deviation: item.deviation,
+      fixation: item.fixation,
+      count: item.count,
+    };
+  }
+
+  return {
+    main: ranked.slice(0, 2),
+    defense: ranked[2],
+    ranked,
+    top1Raw,
+    metrics,
+    fixationTriggered,
+    balancedProtection,
+  };
+}
+/* ================================================================
+   ★★★ 算法结束 ★★★
+   ================================================================ */
 
 /* ================================================================
    时间
@@ -354,7 +513,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v11c',DB_VER=1;let db=null;
+const DB_NAME='pc28_v11d',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -462,125 +621,6 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ v11c 精准自适应平衡核心
-   ================================================================ */
-function runAlgorithm(seq, top1History) {
-  const N = seq.length;
-  if (N === 0) return null;
-
-  const cnt = {大双: 0, 大单: 0, 小双: 0, 小单: 0};
-  for (const c of seq) if (cnt[c] !== undefined) cnt[c]++;
-
-  const lastCombo  = seq[N - 1];
-  const last2Combo = N >= 2 ? seq[N - 2] : null;
-
-  // 1. 一阶条件概率 P(Y|prev)
-  const trans1 = {大双: 1, 大单: 1, 小双: 1, 小单: 1};
-  let totalPrev = 0;
-  for (let i = 1; i < N; i++) {
-    if (seq[i - 1] === lastCombo) { trans1[seq[i]]++; totalPrev++; }
-  }
-  totalPrev += 4;
-  const P1 = {};
-  for (const c of COMBOS) P1[c] = trans1[c] / totalPrev;
-
-  // 2. 二阶条件概率
-  const P2 = {大双: 0.25, 大单: 0.25, 小双: 0.25, 小单: 0.25};
-  if (last2Combo) {
-    const trans2 = {大双: 1, 大单: 1, 小双: 1, 小单: 1};
-    let total2 = 0;
-    for (let i = 2; i < N; i++) {
-      if (seq[i - 2] === last2Combo && seq[i - 1] === lastCombo) {
-        trans2[seq[i]]++; total2++;
-      }
-    }
-    total2 += 4;
-    for (const c of COMBOS) P2[c] = trans2[c] / total2;
-  }
-
-  // 3. 近期活跃度（最近 10 期）
-  const recent = seq.slice(-10);
-  const recentLen = recent.length || 1;
-  const H = {};
-  for (const c of COMBOS) H[c] = recent.filter(x => x === c).length / recentLen;
-
-  // 4. 相对遗漏补偿分
-  const comp = {};
-  for (const c of COMBOS) {
-    const ci = cnt[c];
-    const expGap = (N + 1) / (ci + 1);
-    let pos = -1;
-    for (let i = N - 1; i >= 0; i--) {
-      if (seq[i] === c) { pos = i; break; }
-    }
-    const actGap = pos === -1 ? N : (N - 1 - pos);
-    comp[c] = 100 * Math.tanh((actGap - expGap) / expGap * 1.5);
-  }
-
-  // 5. 概率偏离惩罚
-  const dev = {};
-  for (const c of COMBOS) {
-    dev[c] = 100 * Math.abs(cnt[c] / N - 0.25) / 0.25;
-  }
-
-  // 6. 合成得分
-  const score = {};
-  for (const c of COMBOS) {
-    const trend = 0.5 * P1[c] + 0.3 * P2[c] + 0.2 * H[c];
-    score[c] = 0.5 * trend * 100 + 0.5 * comp[c] - 0.3 * dev[c];
-  }
-
-  // 7. 初始排序
-  let ranked = [...COMBOS].sort((a, b) => score[b] - score[a]);
-  const top1Raw = ranked[0];
-
-  // 8. 防固化：连续 4 期 Top1 → 扣 15
-  let fixationTriggered = false;
-  const th = top1History || [];
-  if (th.length >= STICKY_PERIOD && th.slice(-STICKY_PERIOD).every(x => x === top1Raw)) {
-    score[top1Raw] -= STICKY_PENALTY;
-    ranked = [...COMBOS].sort((a, b) => score[b] - score[a]);
-    fixationTriggered = true;
-  }
-
-  // 9. 均衡保护：Top1-Top2 < 5 → 踢出最热的
-  let balancedProtection = false;
-  if (ranked.length >= 2) {
-    const gap = Math.abs(score[ranked[0]] - score[ranked[1]]);
-    if (gap < BALANCE_THRESHOLD) {
-      let hottest = COMBOS[0];
-      for (const c of COMBOS) if (cnt[c] > cnt[hottest]) hottest = c;
-      if (ranked[0] === hottest || ranked[1] === hottest) {
-        const idx = ranked.indexOf(hottest);
-        ranked.splice(idx, 1);
-        ranked.push(hottest);
-        balancedProtection = true;
-      }
-    }
-  }
-
-  // 10. metrics
-  const metrics = {};
-  for (const c of COMBOS) {
-    metrics[c] = {
-      P1: P1[c], P2: P2[c], H: H[c],
-      comp: comp[c], dev: dev[c],
-      score: score[c], cnt: cnt[c],
-    };
-  }
-
-  return {
-    main: [ranked[0], ranked[1]],
-    defense: ranked[2],
-    ranked: ranked,
-    top1Raw: top1Raw,
-    metrics: metrics,
-    fixationTriggered: fixationTriggered,
-    balancedProtection: balancedProtection,
-  };
-}
-
-/* ================================================================
    历史重建
    ================================================================ */
 async function rebuildHistoryFromDraws(){
@@ -597,8 +637,8 @@ async function rebuildHistoryFromDraws(){
   const startK = n - maxRebuild;
 
   const localTop1 = [];
-
   const newPreds = [];
+
   for (let k = startK; k < n; k++) {
     const predIssue = asc[k - 1].issue;
     if (existingKeys.has(predIssue)) continue;
@@ -622,10 +662,8 @@ async function rebuildHistoryFromDraws(){
       key: predIssue, issue: predIssue,
       predict_time: asc[k - 1].draw_time,
       main: pred.main, defense: pred.defense,
-      ranked: pred.ranked,
-      metrics: pred.metrics,
-      actual: actual,
-      main_hit: mainHit, def_hit: defHit,
+      ranked: pred.ranked, metrics: pred.metrics,
+      actual: actual, main_hit: mainHit, def_hit: defHit,
       historical: true,
     });
   }
@@ -996,43 +1034,48 @@ function renderPrediction(pred){
 
   const fixEl = document.getElementById('fixationMsg');
   const msgs = [];
-  if (pred.fixationTriggered) msgs.push(`⚠️ 防固化：Top1 扣 ${STICKY_PENALTY} 分`);
-  if (pred.balancedProtection) msgs.push(`⚖️ 均衡保护：踢出最热`);
+  if (pred.fixationTriggered) msgs.push(`⚠️ 抗固化触发`);
+  if (pred.balancedProtection) msgs.push(`⚖️ 均衡纠偏触发`);
   fixEl.textContent = msgs.join('  |  ');
   fixEl.className = msgs.length ? 'warn' : '';
 
+  // 表格（兼容处理：有字段就显示，没有就 -）
   const tbody = document.querySelector('#metricsTable tbody');
   tbody.innerHTML = '';
   pred.ranked.forEach((c, idx) => {
-    const m = pred.metrics[c];
+    const m = pred.metrics[c] || {};
     const tr = document.createElement('tr');
     if (idx < 2) tr.style.background = '#ecfdf5';
     else if (idx === 2) tr.style.background = '#fffbeb';
+
+    const fmt = (v, digits = 1) => (v !== undefined && v !== null && Number.isFinite(v)) ? v.toFixed(digits) : '-';
+
     tr.innerHTML = `
       <td><b>${c}</b></td>
-      <td class="num" style="font-size:10px">${(m.P1*100).toFixed(1)}%</td>
-      <td class="num" style="font-size:10px">${(m.P2*100).toFixed(1)}%</td>
-      <td class="num" style="font-size:10px">${(m.H*100).toFixed(0)}%</td>
-      <td class="num" style="font-size:10px;color:${m.comp>=0?'#059669':'#dc2626'};font-weight:800">${m.comp>=0?'+':''}${m.comp.toFixed(0)}</td>
-      <td class="num" style="font-size:10px;color:#8b96a8">${m.dev.toFixed(0)}</td>
-      <td class="num" style="font-weight:800;color:#4f46e5">${m.score.toFixed(1)}</td>
+      <td class="num" style="font-size:10px">${fmt(m.trend)}</td>
+      <td class="num" style="font-size:10px">${fmt(m.omission)}</td>
+      <td class="num" style="font-size:10px">${fmt(m.balance)}</td>
+      <td class="num" style="font-size:10px">${fmt(m.deviation)}</td>
+      <td class="num" style="font-size:10px">${fmt(m.fixation)}</td>
+      <td class="num" style="font-weight:800;color:#4f46e5">${fmt(m.score)}</td>
       <td>[${idx + 1}]</td>
     `;
     tbody.appendChild(tr);
   });
 
+  // 4 个卡片
   const boxes = document.getElementById('metricBoxes');
   boxes.innerHTML = '';
   pred.ranked.forEach((c, idx) => {
-    const m = pred.metrics[c];
+    const m = pred.metrics[c] || {};
     const div = document.createElement('div');
     div.className = 'metric-box' + (idx === 0 ? ' rank1' : idx === 1 ? ' rank2' : '');
     const tag = idx === 0 ? '主推1' : idx === 1 ? '主推2' : idx === 2 ? '防守' : '候选';
-    const compSign = m.comp >= 0 ? '+' : '';
+    const scoreVal = Number.isFinite(m.score) ? m.score.toFixed(1) : '-';
     div.innerHTML = `
-      <div class="mv">${m.score.toFixed(1)}</div>
+      <div class="mv">${scoreVal}</div>
       <div class="ml">${c} · ${tag}</div>
-      <div class="mci">comp ${compSign}${m.comp.toFixed(0)} | cnt ${m.cnt}</div>
+      <div class="mci">cnt ${m.count ?? '-'}</div>
     `;
     boxes.appendChild(div);
   });
