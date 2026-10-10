@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 v11e 二项标准化均值回归</title>
+<title>PC28 v11e 信息熵模型</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -76,6 +76,7 @@ th{color:var(--text-dim);font-weight:600}
 .progress-bar.soon{background:linear-gradient(90deg,#f59e0b,#fb923c)}
 .progress-bar.urgent{background:linear-gradient(90deg,#ef4444,#dc2626);animation:p .8s infinite}
 .progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);margin-top:4px;font-weight:600}
+
 .pred-line{display:flex;justify-content:center;align-items:baseline;gap:10px;padding:16px 6px;font-weight:800;font-size:clamp(14px,4.2vw,18px);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pred-line .issue-tag{color:#4f46e5;font-weight:900;flex-shrink:0;margin-right:2px}
 .pred-line .item{display:inline-flex;align-items:baseline;flex-shrink:0}
@@ -83,6 +84,7 @@ th{color:var(--text-dim);font-weight:600}
 .pred-line .main-val{color:#059669}
 .pred-line .def-val{color:#d97706}
 .pred-line .pipe{color:#cbd5e1;font-weight:400;font-size:.85em;flex-shrink:0}
+
 .scratch-wrap{position:relative;margin-top:8px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);border:1px solid var(--border);min-height:110px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.9)}
 .scratch-under{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 6px}
 .num-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%}
@@ -151,7 +153,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 v11e 二项标准化 <span class="k-badge" id="kDisplay">二项均值 v11e</span></h1>
+  <h1><span class="logo-dot"></span>种瓜得豆·7223 <span class="k-badge" id="kDisplay">MSE-AQHM v11e</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -233,7 +235,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细（二项标准化 + 均值回归）</h2>
+    <h2>综合得分明细（多尺度信息熵自适应对冲）</h2>
     <table id="metricsTable">
       <thead>
         <tr>
@@ -246,12 +248,11 @@ th{color:var(--text-dim);font-weight:600}
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
       <b style="color:var(--text-2)">算法构成：</b><br>
-      • 二项分布 Z-Score 标准化 + 均值回归 φ_rev<br>
-      • 短期指数加权动量（λ=0.80）<br>
-      • 香农信息熵动态权重 ω<br>
-      • 遗漏期数补偿（饱和常数 0.15）<br>
-      • 防固化惩罚（基于 Top1 历史）<br>
-      • Softmax 温度缩放（σ=4.5）归一化
+      • 香农信息熵 H 动态融合（趋势 ↔ 均值回归）<br>
+      • 皮尔逊标准化残差 + 逻辑斯蒂映射（均值回归）<br>
+      • EWMA 动量（λ=0.80）+ 一阶马尔可夫（Laplace α=1.0）<br>
+      • 动量自适应防固化惩罚（P_anti）<br>
+      • Softmax 温度缩放（σ=4.0）归一化
     </div>
   </div>
   <div class="card">
@@ -456,14 +457,14 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ v11e 二项标准化均值回归（原样保留）
+   ★ v11e 多尺度信息熵自适应量化对冲模型（原样保留）
    ================================================================ */
 function runAlgorithm(seq, top1History) {
     const categories = ['大双', '大单', '小双', '小单'];
-    const rawN = seq ? seq.length : 0;
+    const N = seq ? seq.length : 0;
     
-    // 边界保护：若开奖序列为空，返回均等兜底分布
-    if (rawN === 0) {
+    // 边界保护：若序列为空，返回等概率兜底
+    if (N === 0) {
         const metrics = {};
         categories.forEach(c => metrics[c] = { score: 0.25 });
         return {
@@ -477,28 +478,32 @@ function runAlgorithm(seq, top1History) {
         };
     }
 
-    // 截取或对齐至最优实战窗口 N = 50（若数据不足则取实际长度）
-    const N = Math.min(rawN, 50);
-    const effectiveSeq = seq.slice(rawN - N);
-
-    // 1. 统计当前窗口内各组合出现次数 X_c
+    // 1. 基础频数统计与香农信息熵 H 计算
     const counts = {};
     categories.forEach(c => counts[c] = 0);
-    effectiveSeq.forEach(item => {
+    seq.forEach(item => {
         if (counts[item] !== undefined) counts[item]++;
     });
 
-    // 2. 计算二项分布标准化 Z-Score 及均值回归评分 Phi_rev(c)
-    // 理论期望 mu = N * 0.25, 标准差 sigma = sqrt(N * 0.25 * 0.75)
-    const mu = N * 0.25;
-    const sigma = Math.sqrt(N * 0.25 * 0.75) + 1e-8;
-    const phiRev = {};
+    let entropy = 0;
     categories.forEach(c => {
-        const Z = (counts[c] - mu) / sigma;
-        phiRev[c] = -Math.tanh(0.8 * Z);
+        const p = counts[c] / N;
+        if (p > 0) {
+            entropy -= p * (Math.log(p) / Math.LN2);
+        }
+    });
+    const H_normalized = Math.min(Math.max(entropy / 2.0, 0), 1.0);
+
+    // 2. 信号一：皮尔逊标准化残差与均值回归得分 S_mean
+    const sMean = {};
+    const denominatorZ = Math.sqrt(0.1875 * N) + 1e-12;
+    categories.forEach(c => {
+        const z = (counts[c] - 0.25 * N) / denominatorZ;
+        // 逻辑斯蒂映射：z越小（越冷），得分越高
+        sMean[c] = 1.0 / (1.0 + Math.exp(1.5 * z));
     });
 
-    // 3. 计算短期指数加权动量 M_trend(c) (lambda = 0.80)
+    // 3. 信号二：EWMA 动量与一阶马尔可夫交织信号 S_trend
     const lambda = 0.80;
     let weightSum = 0;
     const weights = [];
@@ -508,107 +513,92 @@ function runAlgorithm(seq, top1History) {
         weightSum += w;
     }
 
-    const momentumRaw = {};
-    categories.forEach(c => momentumRaw[c] = 0);
+    const momentum = {};
+    categories.forEach(c => momentum[c] = 0);
     for (let i = 0; i < N; i++) {
-        const item = effectiveSeq[i];
-        if (momentumRaw[item] !== undefined) {
-            momentumRaw[item] += weights[i] / (weightSum + 1e-12);
+        if (momentum[seq[i]] !== undefined) {
+            momentum[seq[i]] += weights[i] / (weightSum + 1e-12);
         }
     }
-    const totalMomentum = categories.reduce((sum, c) => sum + momentumRaw[c], 0) + 1e-8;
-    const momentumNormalized = {};
-    categories.forEach(c => {
-        momentumNormalized[c] = momentumRaw[c] / totalMomentum;
-    });
 
-    // 4. 计算香农信息熵 H 与正则化系数 Omega
-    let entropy = 0;
-    categories.forEach(c => {
-        const p_c = counts[c] / N;
-        if (p_c > 0) {
-            entropy -= p_c * Math.log(p_c);
-        }
-    });
-    const maxEntropy = Math.log(4);
-    const omega = Math.min(Math.max(entropy / maxEntropy, 0), 1);
-
-    // 5. 计算遗漏期数补偿 O(c)
-    const omissionScores = {};
-    const omissionCounts = {};
-    categories.forEach(c => {
-        let lastIdx = 0; // 1-based index in effectiveSeq
-        for (let i = N - 1; i >= 0; i--) {
-            if (effectiveSeq[i] === c) {
-                lastIdx = i + 1;
-                break;
+    // 一阶马尔可夫条件概率
+    const lastState = seq[N - 1];
+    const markovRaw = {};
+    categories.forEach(c => markovRaw[c] = 0);
+    let transTotal = 0;
+    if (N >= 2) {
+        for (let t = 0; t < N - 1; t++) {
+            if (seq[t] === lastState) {
+                const nextItem = seq[t + 1];
+                if (markovRaw[nextItem] !== undefined) {
+                    markovRaw[nextItem] += 1;
+                    transTotal += 1;
+                }
             }
         }
-        const g = lastIdx === 0 ? N : (N - lastIdx);
-        omissionCounts[c] = g;
-        omissionScores[c] = 1.0 - Math.exp(-0.15 * g);
+    }
+    const markovScores = {};
+    categories.forEach(c => {
+        markovScores[c] = (markovRaw[c] + 1.0) / (transTotal + 4.0);
     });
 
-    // 6. 动态权重分配与原始得分计算
-    const w_rev = 0.50 * omega + 0.30 * (1.0 - omega);
-    const w_mom = 0.50 * (1.0 - omega);
-    const w_om  = 0.20;
+    const sTrend = {};
+    categories.forEach(c => {
+        sTrend[c] = 0.6 * momentum[c] + 0.4 * markovScores[c];
+    });
 
+    // 4. 香农熵动态融合：趋势与均值回归的自适应对冲
     const scoreRaw = {};
     categories.forEach(c => {
-        scoreRaw[c] = w_rev * phiRev[c] + w_mom * momentumNormalized[c] + w_om * omissionScores[c];
+        scoreRaw[c] = (1.0 - H_normalized) * sTrend[c] + H_normalized * sMean[c];
     });
 
-    // 7. 防固化纠偏机制 (Top1 历史惩罚)
-    const L = top1History ? top1History.length : 0;
+    // 5. 动量自适应防固化惩罚 P_anti
+    const L = top1History ? Math.min(top1History.length, 15) : 0;
     const f_top1 = {};
     categories.forEach(c => {
         if (L === 0) {
             f_top1[c] = 0;
         } else {
-            let count = 0;
+            let hit = 0;
             for (let k = 0; k < L; k++) {
-                if (top1History[k] === c) count++;
+                if (top1History[k] === c) hit++;
             }
-            f_top1[c] = count / L;
+            f_top1[c] = hit / L;
         }
     });
 
-    // 对得分施加动量解耦的反固化惩罚
+    const finalWeightedScores = {};
     categories.forEach(c => {
-        const penalty = 1.0 - 0.35 * f_top1[c] * Math.exp(-4.0 * momentumNormalized[c]);
-        scoreRaw[c] *= penalty;
+        const pAnti = 1.0 - 0.35 * f_top1[c] * Math.exp(-3.0 * sTrend[c]);
+        finalWeightedScores[c] = scoreRaw[c] * pAnti;
     });
 
-    // 8. 稳定温度缩放与最终概率归一化 (sigma_temp = 4.5)
-    const sigmaTemp = 4.5;
-    const expScores = {};
+    // 6. 稳定温度缩放 (sigma = 4.0) 与 Softmax 归一化
+    const sigma = 4.0;
     let expSum = 0;
+    const expMap = {};
     categories.forEach(c => {
-        const expVal = Math.exp(sigmaTemp * scoreRaw[c]);
-        expScores[c] = expVal;
-        expSum += expVal;
+        const val = Math.exp(sigma * finalWeightedScores[c]);
+        expMap[c] = val;
+        expSum += val;
     });
 
     const finalScores = {};
     categories.forEach(c => {
-        finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
+        finalScores[c] = expSum > 0 ? (expMap[c] / expSum) : 0.25;
     });
 
-    // 9. 排序与结构映射
+    // 7. 排序与结构映射
     const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
     const top1Raw = ranked[0];
     const main = [ranked[0], ranked[1]];
     const defense = ranked[2];
 
-    // 10. 状态判定
-    const fixationTriggered = L > 0 && f_top1[top1Raw] >= 0.5;
-    const allOmissionGt8 = categories.every(c => omissionCounts[c] > 8);
-    const maxOmission = Math.max(...Object.values(omissionCounts));
-    const minOmission = Math.min(...Object.values(omissionCounts));
-    const balancedProtection = allOmissionGt8 && (maxOmission - minOmission > 5);
+    // 状态判定
+    const fixationTriggered = L > 0 && f_top1[top1Raw] >= 0.4;
+    const balancedProtection = H_normalized > 0.95; // 当熵极高时触发全局均衡保护
 
-    // 整理指标明细
     const metrics = {};
     categories.forEach(c => {
         metrics[c] = { score: Number(finalScores[c].toFixed(4)) };
@@ -808,7 +798,7 @@ function getNextIssue(){
 }
 
 /* ================================================================
-   复制
+   复制（含期号）
    ================================================================ */
 function copyPrediction(){
   if (!state.currentPred) { setStatus('暂无预测可复制', 'warn'); return; }
