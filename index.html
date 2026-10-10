@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 v11d 新算法版</title>
+<title>PC28 v11e 二项标准化均值回归</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -76,11 +76,13 @@ th{color:var(--text-dim);font-weight:600}
 .progress-bar.soon{background:linear-gradient(90deg,#f59e0b,#fb923c)}
 .progress-bar.urgent{background:linear-gradient(90deg,#ef4444,#dc2626);animation:p .8s infinite}
 .progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);margin-top:4px;font-weight:600}
-.pred-line{display:flex;justify-content:center;align-items:baseline;gap:20px;padding:16px 6px;font-weight:800;font-size:clamp(15px,4.6vw,20px);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.pred-line .item{display:inline-flex;align-items:baseline}
+.pred-line{display:flex;justify-content:center;align-items:baseline;gap:10px;padding:16px 6px;font-weight:800;font-size:clamp(14px,4.2vw,18px);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pred-line .issue-tag{color:#4f46e5;font-weight:900;flex-shrink:0;margin-right:2px}
+.pred-line .item{display:inline-flex;align-items:baseline;flex-shrink:0}
 .pred-line .lbl{font-weight:600;color:var(--text-dim);font-size:.8em;margin-right:4px}
 .pred-line .main-val{color:#059669}
 .pred-line .def-val{color:#d97706}
+.pred-line .pipe{color:#cbd5e1;font-weight:400;font-size:.85em;flex-shrink:0}
 .scratch-wrap{position:relative;margin-top:8px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);border:1px solid var(--border);min-height:110px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.9)}
 .scratch-under{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 6px}
 .num-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%}
@@ -149,7 +151,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 v11d 新算法版 <span class="k-badge" id="kDisplay">新算法 v11d</span></h1>
+  <h1><span class="logo-dot"></span>PC28 v11e 二项标准化 <span class="k-badge" id="kDisplay">二项均值 v11e</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -231,30 +233,25 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细</h2>
+    <h2>综合得分明细（二项标准化 + 均值回归）</h2>
     <table id="metricsTable">
       <thead>
         <tr>
           <th>组合</th>
-          <th>趋势 T</th>
-          <th>遗漏 O</th>
-          <th>均衡 B</th>
-          <th>偏离 D</th>
-          <th>固化 F</th>
-          <th>总分</th>
+          <th>归一化得分</th>
           <th>排名</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
-      <b style="color:var(--text-2)">公式：</b><br>
-      Score = 0.45×趋势T + 0.20×遗漏O + 0.15×均衡B − 0.10×偏离D − 0.10×固化F<br>
-      • <b>T</b>：0.50×一阶转移 + 0.20×二阶转移 + 0.30×指数加权活跃度<br>
-      • <b>O</b>：相对遗漏（tanh 压制），冷门获得加分<br>
-      • <b>B</b>：低于 25% 基线获得正分<br>
-      • <b>D</b>：偏离 25% 越远扣得越多<br>
-      • <b>F</b>：Top1 连续相同时扣分
+      <b style="color:var(--text-2)">算法构成：</b><br>
+      • 二项分布 Z-Score 标准化 + 均值回归 φ_rev<br>
+      • 短期指数加权动量（λ=0.80）<br>
+      • 香农信息熵动态权重 ω<br>
+      • 遗漏期数补偿（饱和常数 0.15）<br>
+      • 防固化惩罚（基于 Top1 历史）<br>
+      • Softmax 温度缩放（σ=4.5）归一化
     </div>
   </div>
   <div class="card">
@@ -293,7 +290,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <script>
 /* ================================================================
-   全局配置
+   配置
    ================================================================ */
 const APIS = [
   { url: 'https://yu28.top/api/kj?nbr=100', headers: { 'X-Api-Key': 'yu28_6e21b2467d66f604' } },
@@ -306,168 +303,6 @@ const DEFAULT_PERIOD_MS = 210 * 1000;
 const TREND_MAX = 100;
 const HISTORY_REBUILD_COUNT = 50;
 const HISTORY_PER_PAGE = 25;
-
-/* ================================================================
-   ★★★ 核心算法（新算法版）★★★
-   ================================================================ */
-'use strict';
-
-function runAlgorithm(seq, top1History) {
-  const COMBOS = ['大双', '大单', '小双', '小单'];
-  const VALID = new Set(COMBOS);
-
-  const ALPHA = 2;
-  const BASELINE = 0.25;
-  const PROB_SCALE = 0.15;
-  const DECAY = 0.8;
-
-  const MAX_WINDOW = 200;
-  const EW_WINDOW = 10;
-  const HISTORY_WINDOW = 20;
-
-  const inputSeq = Array.isArray(seq) ? seq : [];
-  const cleanSeq = inputSeq.filter(value => VALID.has(value)).slice(-MAX_WINDOW);
-  const N = cleanSeq.length;
-
-  const hist = Array.isArray(top1History) ? top1History.slice(-HISTORY_WINDOW) : [];
-
-  const counts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
-  const lastPos = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
-
-  for (let i = 0; i < N; i += 1) {
-    const combo = cleanSeq[i];
-    counts[combo] += 1;
-    lastPos[combo] = i + 1;
-  }
-
-  const firstCounts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
-  let firstTotal = 0;
-  const latest = N > 0 ? cleanSeq[N - 1] : null;
-
-  for (let t = 0; t < N - 1; t += 1) {
-    if (cleanSeq[t] === latest) {
-      const nextCombo = cleanSeq[t + 1];
-      firstCounts[nextCombo] += 1;
-      firstTotal += 1;
-    }
-  }
-
-  const secondCounts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
-  let secondTotal = 0;
-
-  if (N >= 2) {
-    const latestPrev = cleanSeq[N - 2];
-    for (let t = 1; t < N - 1; t += 1) {
-      const matchesState = cleanSeq[t - 1] === latestPrev && cleanSeq[t] === latest;
-      if (matchesState) {
-        const nextCombo = cleanSeq[t + 1];
-        secondCounts[nextCombo] += 1;
-        secondTotal += 1;
-      }
-    }
-  }
-
-  const L = Math.min(N, EW_WINDOW);
-  const weightedCounts = Object.fromEntries(COMBOS.map(combo => [combo, 0]));
-  let weightTotal = 0;
-
-  for (let t = 0; t < L; t += 1) {
-    const weight = Math.pow(DECAY, t);
-    const combo = cleanSeq[N - 1 - t];
-    weightedCounts[combo] += weight;
-    weightTotal += weight;
-  }
-
-  let fixationCombo = null;
-  let fixationRun = 0;
-
-  if (hist.length > 0) {
-    const lastHistoryValue = hist[hist.length - 1];
-    if (VALID.has(lastHistoryValue)) {
-      fixationCombo = lastHistoryValue;
-      for (let i = hist.length - 1; i >= 0 && hist[i] === fixationCombo; i -= 1) {
-        fixationRun += 1;
-      }
-    }
-  }
-
-  function z(probability) {
-    return Math.tanh((probability - BASELINE) / PROB_SCALE);
-  }
-
-  const details = COMBOS.map((combo, index) => {
-    const count = counts[combo];
-
-    const p = (count + ALPHA) / (N + 4 * ALPHA);
-    const p1 = (firstCounts[combo] + ALPHA) / (firstTotal + 4 * ALPHA);
-    const p2 = (secondCounts[combo] + ALPHA) / (secondTotal + 4 * ALPHA);
-    const e = (weightedCounts[combo] + ALPHA) / (weightTotal + 4 * ALPHA);
-
-    const z1 = z(p1);
-    const z2 = z(p2);
-    const ze = z(e);
-
-    const trend = 100 * (0.50 * z1 + 0.20 * z2 + 0.30 * ze);
-
-    const gap = count === 0 ? N + 1 : N - lastPos[combo];
-    const theoreticalGap = (N + 1) / (count + 1);
-    const omission = 100 * Math.tanh((gap - theoreticalGap) / (1.5 * theoreticalGap));
-
-    const balance = 100 * Math.tanh((BASELINE - p) / PROB_SCALE);
-    const deviation = 100 * Math.tanh(Math.abs(p - BASELINE) / PROB_SCALE);
-
-    const fixationK = combo === fixationCombo ? fixationRun : 0;
-    const fixation = 100 * (1 - Math.exp(-fixationK / 3));
-
-    const score = 0.45 * trend + 0.20 * omission + 0.15 * balance - 0.10 * deviation - 0.10 * fixation;
-    const finiteScore = Number.isFinite(score) ? score : 0;
-
-    return {
-      combo, index,
-      score: finiteScore,
-      trend, omission, balance, deviation, fixation,
-      count,
-    };
-  });
-
-  details.sort((a, b) => {
-    if (b.score !== a.score) return b.score - a.score;
-    return a.index - b.index;
-  });
-
-  const ranked = details.map(item => item.combo);
-  const top1Raw = ranked[0];
-
-  const fixationTriggered = details.some(item => item.fixation > 0);
-  const balancedProtection = details.some(item => item.balance > 0);
-
-  const metrics = {};
-  for (const combo of COMBOS) {
-    const item = details.find(x => x.combo === combo);
-    metrics[combo] = {
-      score: item.score,
-      trend: item.trend,
-      omission: item.omission,
-      balance: item.balance,
-      deviation: item.deviation,
-      fixation: item.fixation,
-      count: item.count,
-    };
-  }
-
-  return {
-    main: ranked.slice(0, 2),
-    defense: ranked[2],
-    ranked,
-    top1Raw,
-    metrics,
-    fixationTriggered,
-    balancedProtection,
-  };
-}
-/* ================================================================
-   ★★★ 算法结束 ★★★
-   ================================================================ */
 
 /* ================================================================
    时间
@@ -513,7 +348,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v11d',DB_VER=1;let db=null;
+const DB_NAME='pc28_v11e',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -621,6 +456,176 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
+   ★ v11e 二项标准化均值回归（原样保留）
+   ================================================================ */
+function runAlgorithm(seq, top1History) {
+    const categories = ['大双', '大单', '小双', '小单'];
+    const rawN = seq ? seq.length : 0;
+    
+    // 边界保护：若开奖序列为空，返回均等兜底分布
+    if (rawN === 0) {
+        const metrics = {};
+        categories.forEach(c => metrics[c] = { score: 0.25 });
+        return {
+            main: [categories[0], categories[1]],
+            defense: categories[2],
+            ranked: [...categories],
+            top1Raw: categories[0],
+            metrics,
+            fixationTriggered: false,
+            balancedProtection: false
+        };
+    }
+
+    // 截取或对齐至最优实战窗口 N = 50（若数据不足则取实际长度）
+    const N = Math.min(rawN, 50);
+    const effectiveSeq = seq.slice(rawN - N);
+
+    // 1. 统计当前窗口内各组合出现次数 X_c
+    const counts = {};
+    categories.forEach(c => counts[c] = 0);
+    effectiveSeq.forEach(item => {
+        if (counts[item] !== undefined) counts[item]++;
+    });
+
+    // 2. 计算二项分布标准化 Z-Score 及均值回归评分 Phi_rev(c)
+    // 理论期望 mu = N * 0.25, 标准差 sigma = sqrt(N * 0.25 * 0.75)
+    const mu = N * 0.25;
+    const sigma = Math.sqrt(N * 0.25 * 0.75) + 1e-8;
+    const phiRev = {};
+    categories.forEach(c => {
+        const Z = (counts[c] - mu) / sigma;
+        phiRev[c] = -Math.tanh(0.8 * Z);
+    });
+
+    // 3. 计算短期指数加权动量 M_trend(c) (lambda = 0.80)
+    const lambda = 0.80;
+    let weightSum = 0;
+    const weights = [];
+    for (let t = 1; t <= N; t++) {
+        const w = Math.pow(lambda, N - t);
+        weights.push(w);
+        weightSum += w;
+    }
+
+    const momentumRaw = {};
+    categories.forEach(c => momentumRaw[c] = 0);
+    for (let i = 0; i < N; i++) {
+        const item = effectiveSeq[i];
+        if (momentumRaw[item] !== undefined) {
+            momentumRaw[item] += weights[i] / (weightSum + 1e-12);
+        }
+    }
+    const totalMomentum = categories.reduce((sum, c) => sum + momentumRaw[c], 0) + 1e-8;
+    const momentumNormalized = {};
+    categories.forEach(c => {
+        momentumNormalized[c] = momentumRaw[c] / totalMomentum;
+    });
+
+    // 4. 计算香农信息熵 H 与正则化系数 Omega
+    let entropy = 0;
+    categories.forEach(c => {
+        const p_c = counts[c] / N;
+        if (p_c > 0) {
+            entropy -= p_c * Math.log(p_c);
+        }
+    });
+    const maxEntropy = Math.log(4);
+    const omega = Math.min(Math.max(entropy / maxEntropy, 0), 1);
+
+    // 5. 计算遗漏期数补偿 O(c)
+    const omissionScores = {};
+    const omissionCounts = {};
+    categories.forEach(c => {
+        let lastIdx = 0; // 1-based index in effectiveSeq
+        for (let i = N - 1; i >= 0; i--) {
+            if (effectiveSeq[i] === c) {
+                lastIdx = i + 1;
+                break;
+            }
+        }
+        const g = lastIdx === 0 ? N : (N - lastIdx);
+        omissionCounts[c] = g;
+        omissionScores[c] = 1.0 - Math.exp(-0.15 * g);
+    });
+
+    // 6. 动态权重分配与原始得分计算
+    const w_rev = 0.50 * omega + 0.30 * (1.0 - omega);
+    const w_mom = 0.50 * (1.0 - omega);
+    const w_om  = 0.20;
+
+    const scoreRaw = {};
+    categories.forEach(c => {
+        scoreRaw[c] = w_rev * phiRev[c] + w_mom * momentumNormalized[c] + w_om * omissionScores[c];
+    });
+
+    // 7. 防固化纠偏机制 (Top1 历史惩罚)
+    const L = top1History ? top1History.length : 0;
+    const f_top1 = {};
+    categories.forEach(c => {
+        if (L === 0) {
+            f_top1[c] = 0;
+        } else {
+            let count = 0;
+            for (let k = 0; k < L; k++) {
+                if (top1History[k] === c) count++;
+            }
+            f_top1[c] = count / L;
+        }
+    });
+
+    // 对得分施加动量解耦的反固化惩罚
+    categories.forEach(c => {
+        const penalty = 1.0 - 0.35 * f_top1[c] * Math.exp(-4.0 * momentumNormalized[c]);
+        scoreRaw[c] *= penalty;
+    });
+
+    // 8. 稳定温度缩放与最终概率归一化 (sigma_temp = 4.5)
+    const sigmaTemp = 4.5;
+    const expScores = {};
+    let expSum = 0;
+    categories.forEach(c => {
+        const expVal = Math.exp(sigmaTemp * scoreRaw[c]);
+        expScores[c] = expVal;
+        expSum += expVal;
+    });
+
+    const finalScores = {};
+    categories.forEach(c => {
+        finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
+    });
+
+    // 9. 排序与结构映射
+    const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
+    const top1Raw = ranked[0];
+    const main = [ranked[0], ranked[1]];
+    const defense = ranked[2];
+
+    // 10. 状态判定
+    const fixationTriggered = L > 0 && f_top1[top1Raw] >= 0.5;
+    const allOmissionGt8 = categories.every(c => omissionCounts[c] > 8);
+    const maxOmission = Math.max(...Object.values(omissionCounts));
+    const minOmission = Math.min(...Object.values(omissionCounts));
+    const balancedProtection = allOmissionGt8 && (maxOmission - minOmission > 5);
+
+    // 整理指标明细
+    const metrics = {};
+    categories.forEach(c => {
+        metrics[c] = { score: Number(finalScores[c].toFixed(4)) };
+    });
+
+    return {
+        main,
+        defense,
+        ranked,
+        top1Raw,
+        metrics,
+        fixationTriggered,
+        balancedProtection
+    };
+}
+
+/* ================================================================
    历史重建
    ================================================================ */
 async function rebuildHistoryFromDraws(){
@@ -637,8 +642,8 @@ async function rebuildHistoryFromDraws(){
   const startK = n - maxRebuild;
 
   const localTop1 = [];
-  const newPreds = [];
 
+  const newPreds = [];
   for (let k = startK; k < n; k++) {
     const predIssue = asc[k - 1].issue;
     if (existingKeys.has(predIssue)) continue;
@@ -662,8 +667,10 @@ async function rebuildHistoryFromDraws(){
       key: predIssue, issue: predIssue,
       predict_time: asc[k - 1].draw_time,
       main: pred.main, defense: pred.defense,
-      ranked: pred.ranked, metrics: pred.metrics,
-      actual: actual, main_hit: mainHit, def_hit: defHit,
+      ranked: pred.ranked,
+      metrics: pred.metrics,
+      actual: actual,
+      main_hit: mainHit, def_hit: defHit,
       historical: true,
     });
   }
@@ -791,13 +798,24 @@ function toggleScratch(){ if (state.scratchActive) revealAll(); else initScratch
 function updateScratchBtn(){ document.getElementById('scratchBtn').textContent = state.scratchActive ? '👁 揭晓' : '🎯 刮奖'; }
 
 /* ================================================================
+   计算下一期期号
+   ================================================================ */
+function getNextIssue(){
+  const latest = state.latestDraw;
+  if(!latest || !latest.issue) return '?';
+  const n = parseInt(latest.issue, 10);
+  return isNaN(n) ? latest.issue : String(n + 1);
+}
+
+/* ================================================================
    复制
    ================================================================ */
 function copyPrediction(){
   if (!state.currentPred) { setStatus('暂无预测可复制', 'warn'); return; }
   const main = state.currentPred.main.join('·');
   const def = state.currentPred.defense || '无';
-  const text = `主攻：${main} | 防守：${def}`;
+  const nextIssue = getNextIssue();
+  const text = `${nextIssue}期主攻：${main} | 防守：${def}`;
   const onSuccess = () => {
     const btn = document.getElementById('copyBtn');
     const orig = btn.textContent;
@@ -1028,36 +1046,32 @@ function setLatest(d){
 }
 
 function renderPrediction(pred){
+  const nextIssue = getNextIssue();
   document.getElementById('predLine').innerHTML =
+    `<span class="issue-tag">${nextIssue}期</span>` +
     `<span class="item"><span class="lbl">主攻：</span><span class="main-val">${pred.main.join('·')}</span></span>` +
+    `<span class="pipe">|</span>` +
     `<span class="item"><span class="lbl">防守：</span><span class="def-val">${pred.defense || '无'}</span></span>`;
 
   const fixEl = document.getElementById('fixationMsg');
   const msgs = [];
-  if (pred.fixationTriggered) msgs.push(`⚠️ 抗固化触发`);
-  if (pred.balancedProtection) msgs.push(`⚖️ 均衡纠偏触发`);
+  if (pred.fixationTriggered) msgs.push(`⚠️ 防固化触发`);
+  if (pred.balancedProtection) msgs.push(`⚖️ 均衡保护触发`);
   fixEl.textContent = msgs.join('  |  ');
   fixEl.className = msgs.length ? 'warn' : '';
 
-  // 表格（兼容处理：有字段就显示，没有就 -）
+  // 得分明细表
   const tbody = document.querySelector('#metricsTable tbody');
   tbody.innerHTML = '';
   pred.ranked.forEach((c, idx) => {
-    const m = pred.metrics[c] || {};
+    const m = pred.metrics[c];
     const tr = document.createElement('tr');
     if (idx < 2) tr.style.background = '#ecfdf5';
     else if (idx === 2) tr.style.background = '#fffbeb';
-
-    const fmt = (v, digits = 1) => (v !== undefined && v !== null && Number.isFinite(v)) ? v.toFixed(digits) : '-';
-
+    const score = (m && m.score !== undefined) ? m.score.toFixed(4) : '-';
     tr.innerHTML = `
       <td><b>${c}</b></td>
-      <td class="num" style="font-size:10px">${fmt(m.trend)}</td>
-      <td class="num" style="font-size:10px">${fmt(m.omission)}</td>
-      <td class="num" style="font-size:10px">${fmt(m.balance)}</td>
-      <td class="num" style="font-size:10px">${fmt(m.deviation)}</td>
-      <td class="num" style="font-size:10px">${fmt(m.fixation)}</td>
-      <td class="num" style="font-weight:800;color:#4f46e5">${fmt(m.score)}</td>
+      <td class="num" style="font-weight:800;color:#4f46e5">${score}</td>
       <td>[${idx + 1}]</td>
     `;
     tbody.appendChild(tr);
@@ -1067,15 +1081,14 @@ function renderPrediction(pred){
   const boxes = document.getElementById('metricBoxes');
   boxes.innerHTML = '';
   pred.ranked.forEach((c, idx) => {
-    const m = pred.metrics[c] || {};
+    const m = pred.metrics[c];
     const div = document.createElement('div');
     div.className = 'metric-box' + (idx === 0 ? ' rank1' : idx === 1 ? ' rank2' : '');
     const tag = idx === 0 ? '主推1' : idx === 1 ? '主推2' : idx === 2 ? '防守' : '候选';
-    const scoreVal = Number.isFinite(m.score) ? m.score.toFixed(1) : '-';
+    const scorePct = (m && m.score !== undefined) ? (m.score * 100).toFixed(1) + '%' : '-';
     div.innerHTML = `
-      <div class="mv">${scoreVal}</div>
+      <div class="mv">${scorePct}</div>
       <div class="ml">${c} · ${tag}</div>
-      <div class="mci">cnt ${m.count ?? '-'}</div>
     `;
     boxes.appendChild(div);
   });
