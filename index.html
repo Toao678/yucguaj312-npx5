@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 v20 Master Edition</title>
+<title>PC28 稳定低波动版</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -154,7 +154,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 v20 Master Edition <span class="k-badge" id="kDisplay">v20-Master</span></h1>
+  <h1><span class="logo-dot"></span>PC28 稳定低波动版 <span class="k-badge" id="kDisplay">v21-Stable</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -236,7 +236,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细(v20-Master 全维度量化)</h2>
+    <h2>综合得分明细(稳定抗震荡阻尼模型)</h2>
     <table id="metricsTable">
       <thead>
         <tr>
@@ -249,13 +249,11 @@ th{color:var(--text-dim);font-weight:600}
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
       <b style="color:var(--text-2)">算法构成：</b><br>
-      • 正交维度解耦(大小 & 单双独立建模)<br>
-      • 威布尔风险率遗漏模型(α=1.8, β=12)<br>
-      • 市场状态自适应切换(香农熵 H 动态融合趋势/回归)<br>
-      • 二阶动量加速度(前/后半段频率差)<br>
-      • 博弈论信噪比校准(tanh SNR 放大)<br>
-      • 动量自适应防固化(近 5 期 Top1 主导 → 35% 惩罚)<br>
-      • Softmax 温度缩放(σ=4.5)
+      • 长期历史大窗口基础频率锚定 (权重 70%)<br>
+      • 缓慢平滑动量追踪 (EWMA λ=0.95，权重 15%)<br>
+      • 线性阻尼遗漏补偿分 (最高 15% 温和奖励)<br>
+      • 温和防固化机制 (连续 Top1 达 3 期轻量均分削减)<br>
+      • 低温归一化缩放 (温度系数 σ=2.0，彻底消除剧烈震荡)
     </div>
   </div>
   <div class="card">
@@ -352,7 +350,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v20',DB_VER=1;let db=null;
+const DB_NAME='pc28_v21_stable',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -460,13 +458,12 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ v20-Master-Edition 高精度全维度量化预测算法(原样保留)
+   ★ 低波动抗震荡稳定版预测算法 (Stable-Damped-Edition)
    ================================================================ */
 function runAlgorithm(seq, top1History) {
     const categories = ['大双', '大单', '小双', '小单'];
     const N = seq ? seq.length : 0;
     
-    // 边界保护：若开奖序列为空，返回均等兜底分布
     if (N === 0) {
         const metrics = {};
         categories.forEach(c => metrics[c] = { score: 0.25 });
@@ -481,15 +478,20 @@ function runAlgorithm(seq, top1History) {
         };
     }
 
-    // 解析每个历史元素的属性映射
-    const parsedSeq = seq.map(item => {
-        const isBig = item.includes('大');
-        const isOdd = item.includes('单');
-        return { combo: item, size: isBig ? '大' : '小', parity: isOdd ? '单' : '双' };
+    // 1. 基础长期大窗口频率统计(赋予极强的历史惯性，抗短期噪声)
+    const counts = {};
+    categories.forEach(c => counts[c] = 0);
+    seq.forEach(item => {
+        if (counts[item] !== undefined) counts[item]++;
     });
 
-    // 1. 模块一：正交维度解耦建模(大小 & 单双边际概率)
-    const lambda = 0.90;
+    const longTermFreq = {};
+    categories.forEach(c => {
+        longTermFreq[c] = counts[c] / N; // 长期基准概率 (接近 0.25)
+    });
+
+    // 2. 近期指数加权平滑动量(使用更大的 lambda = 0.95，确保长记忆，拒绝短期乱跳)
+    const lambda = 0.95;
     let weightSum = 0;
     const weights = [];
     for (let t = 1; t <= N; t++) {
@@ -498,59 +500,16 @@ function runAlgorithm(seq, top1History) {
         weightSum += w;
     }
 
-    const sizeMom = { '大': 0, '小': 0 };
-    const parityMom = { '单': 0, '双': 0 };
-    const comboMom = {};
-    categories.forEach(c => comboMom[c] = 0);
-
+    const shortMom = {};
+    categories.forEach(c => shortMom[c] = 0);
     for (let i = 0; i < N; i++) {
-        const p = parsedSeq[i];
-        const wVal = weights[i] / (weightSum + 1e-12);
-        sizeMom[p.size] += wVal;
-        parityMom[p.parity] += wVal;
-        comboMom[p.combo] += wVal;
-    }
-
-    // 2. 模块四：二阶动量加速度计算 (Acceleration)
-    const mid = Math.floor(N / 2);
-    const recentSeq = parsedSeq.slice(mid);
-    const historySeq = parsedSeq.slice(0, mid);
-    
-    const recentMom = {};
-    const historyMom = {};
-    categories.forEach(c => { recentMom[c] = 0; historyMom[c] = 0; });
-
-    recentSeq.forEach(p => { if (recentMom[p.combo] !== undefined) recentMom[p.combo] += 1 / recentSeq.length; });
-    historySeq.forEach(p => { if (historyMom[p.combo] !== undefined) historyMom[p.combo] += 1 / historySeq.length; });
-
-    const acceleration = {};
-    categories.forEach(c => {
-        acceleration[c] = recentMom[c] - historyMom[c]; // 加速度
-    });
-
-    // 3. 自适应一阶马尔可夫转移矩阵 (Laplace alpha = 0.5)
-    const markovRaw = {};
-    categories.forEach(c => markovRaw[c] = 0);
-    const lastState = seq[N - 1];
-    let transitionTotal = 0;
-
-    if (N >= 2) {
-        for (let t = 0; t < N - 1; t++) {
-            if (seq[t] === lastState) {
-                const nextItem = seq[t + 1];
-                if (markovRaw[nextItem] !== undefined) {
-                    markovRaw[nextItem] += 1;
-                    transitionTotal += 1;
-                }
-            }
+        const item = seq[i];
+        if (shortMom[item] !== undefined) {
+            shortMom[item] += weights[i] / (weightSum + 1e-12);
         }
     }
-    const markovScores = {};
-    categories.forEach(c => {
-        markovScores[c] = (markovRaw[c] + 0.5) / (transitionTotal + categories.length * 0.5);
-    });
 
-    // 4. 模块二：基于威布尔分布(Weibull Distribution)的遗漏风险率模型
+    // 3. 线性阻尼遗漏值(抛弃陡峭的指数或威布尔，采用温和的线性饱和补偿)
     const omissionCounts = {};
     categories.forEach(c => {
         let lastIdx = 0;
@@ -560,86 +519,39 @@ function runAlgorithm(seq, top1History) {
                 break;
             }
         }
-        const g = lastIdx === 0 ? N : (N - lastIdx);
-        omissionCounts[c] = g;
+        omissionCounts[c] = lastIdx === 0 ? N : (N - lastIdx);
     });
 
-    const weibullScores = {};
-    const alphaW = 1.8;
-    const betaW = 12.0;
+    const omissionScore = {};
+    const maxOm = Math.max(...Object.values(omissionCounts)) + 1e-8;
     categories.forEach(c => {
-        const g = omissionCounts[c];
-        // 威布尔概率密度/风险率近似表达
-        const ratio = g / betaW;
-        weibullScores[c] = (alphaW / betaW) * Math.pow(ratio, alphaW - 1) * Math.exp(-Math.pow(ratio, alphaW));
+        // 线性归一化遗漏值，最高不超过 0.15 的温和补偿权重，防止冷门突然暴动
+        omissionScore[c] = Math.min(omissionCounts[c] / maxOm, 1.0) * 0.15;
     });
 
-    // 5. 模块三：市场状态自适应切换机(计算香农信息熵 H 判定状态)
-    let entropy = 0;
-    categories.forEach(c => {
-        const p = comboMom[c];
-        if (p > 0) entropy -= p * (Math.log(p) / Math.LN2);
-    });
-    const H_norm = Math.min(Math.max(entropy / 2.0, 0), 1.0);
-    const wTrend = 0.5 + 0.3 * Math.tanh(1.5 - H_norm);
-    const wRevert = 1.0 - wTrend;
-
-    // 6. 综合基础得分汇总(整合正交动量、马尔可夫、威布尔遗漏、二阶加速度)
-    const scoreRawBase = {};
-    categories.forEach(c => {
-        const orthogBonus = sizeMom[c.includes('大') ? '大' : '小'] * parityMom[c.includes('单') ? '单' : '双'];
-        const trendPart = 0.40 * comboMom[c] + 0.30 * markovScores[c] + 0.30 * orthogBonus;
-        const revertPart = 0.70 * weibullScores[c] + 0.30 * Math.max(0, acceleration[c]);
-        
-        scoreRawBase[c] = wTrend * trendPart + wRevert * revertPart + 0.15 * acceleration[c];
-    });
-
-    // 7. 博弈论信噪比与方差校准 (SNR Calibration)
-    let sumScore = 0;
-    categories.forEach(c => sumScore += scoreRawBase[c]);
-    const mu = sumScore / categories.length;
-
-    let varianceSum = 0;
-    categories.forEach(c => {
-        const diff = scoreRawBase[c] - mu;
-        varianceSum += diff * diff;
-    });
-    const sigmaScore = Math.sqrt(varianceSum / categories.length + 1e-12);
-
+    // 4. 核心融合：70% 长期惯性 + 15% 近期动量 + 15% 温和遗漏
     const scoreRaw = {};
     categories.forEach(c => {
-        const snr = 1.0 + 2.0 * Math.tanh((scoreRawBase[c] - mu) / sigmaScore);
-        scoreRaw[c] = scoreRawBase[c] * snr;
+        scoreRaw[c] = 0.70 * longTermFreq[c] + 0.15 * shortMom[c] + 0.15 * omissionScore[c];
     });
 
-    // 8. 动量自适应防固化机制 (Anti-Fixation)
+    // 5. 温和防固化：如果某个组合连续当选，施加温和的平滑均分(不强行打压)
     const L = top1History ? top1History.length : 0;
-    const recentTop1 = L > 0 ? top1History.slice(-5) : [];
+    const recentTop1 = L > 0 ? top1History.slice(-4) : [];
     const top1Counts = {};
     categories.forEach(c => top1Counts[c] = 0);
-    recentTop1.forEach(item => {
-        if (top1Counts[item] !== undefined) top1Counts[item]++;
-    });
+    recentTop1.forEach(item => { if (top1Counts[item] !== undefined) top1Counts[item]++; });
 
     let fixationTriggered = false;
-    let dominantTop1 = null;
-    let maxTop1Count = 0;
     Object.keys(top1Counts).forEach(c => {
-        if (top1Counts[c] > maxTop1Count) {
-            maxTop1Count = top1Counts[c];
-            dominantTop1 = c;
+        if (top1Counts[c] >= 3) { // 连续 3 期以上重复
+            fixationTriggered = true;
+            scoreRaw[c] *= 0.85; // 温和削减 15%，防止死板但也避免剧烈翻转
         }
     });
 
-    if (L >= 3 && recentTop1.length > 0 && (maxTop1Count / recentTop1.length) >= 0.6) {
-        fixationTriggered = true;
-        if (dominantTop1 && scoreRaw[dominantTop1] !== undefined) {
-            scoreRaw[dominantTop1] *= 0.65; // 施加 35% 惩罚防固化
-        }
-    }
-
-    // 9. 温度缩放与 Softmax 归一化(温度系数 sigma = 4.5)
-    const sigmaTemp = 4.5;
+    // 6. 低温缩放(sigma = 2.0)，让 4 个组合的分数保持温和梯度，杜绝极端大起大落
+    const sigmaTemp = 2.0;
     const expScores = {};
     let expSum = 0;
     categories.forEach(c => {
@@ -653,17 +565,14 @@ function runAlgorithm(seq, top1History) {
         finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
     });
 
-    // 10. 排序与映射
+    // 7. 结构映射
     const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
     const top1Raw = ranked[0];
     const main = [ranked[0], ranked[1]];
     const defense = ranked[2];
 
-    const omValues = Object.values(omissionCounts);
-    const maxOm = Math.max(...omValues);
-    const minOm = Math.min(...omValues);
-    const meanOm = omValues.reduce((a, b) => a + b, 0) / omValues.length;
-    const balancedProtection = (meanOm > 6) && ((maxOm - minOm) >= 12) || (H_norm > 0.92);
+    const meanOm = Object.values(omissionCounts).reduce((a, b) => a + b, 0) / categories.length;
+    const balancedProtection = meanOm > 10;
 
     const metrics = {};
     categories.forEach(c => {
