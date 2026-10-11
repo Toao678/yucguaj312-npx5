@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>种瓜得豆·7223 (EV-SNR 量化版)</title>
+<title>PC28 v20 Master Edition</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -56,6 +56,7 @@ th{color:var(--text-dim);font-weight:600}
 .metric-box{background:linear-gradient(135deg,#f0f5ff 0%,#ede9fe 100%);border:1px solid #e0e7ff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);position:relative}
 .metric-box .mv{font-size:22px;font-weight:900;color:#4f46e5;font-variant-numeric:tabular-nums}
 .metric-box .ml{font-size:10px;color:var(--text-dim);margin-top:2px;font-weight:700;letter-spacing:0.5px}
+.metric-box .mci{font-size:9px;color:var(--text-faint);margin-top:3px;font-variant-numeric:tabular-nums}
 .metric-box.rank1{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-color:#6ee7b7}
 .metric-box.rank1 .mv{color:#047857}
 .metric-box.rank2{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#fbbf24}
@@ -153,7 +154,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>种瓜得豆·7223 <span class="k-badge" id="kDisplay">v12-ev-snr</span></h1>
+  <h1><span class="logo-dot"></span>PC28 v20 Master Edition <span class="k-badge" id="kDisplay">v20-Master</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -235,7 +236,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细(EV-SNR量化校准模型)</h2>
+    <h2>综合得分明细(v20-Master 全维度量化)</h2>
     <table id="metricsTable">
       <thead>
         <tr>
@@ -248,11 +249,13 @@ th{color:var(--text-dim);font-weight:600}
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
       <b style="color:var(--text-2)">算法构成：</b><br>
-      • 指数衰减动态窗口 (λ=0.92，等效窗口24期)<br>
-      • 自适应一阶马尔可夫转移矩阵 (Laplace α=0.5)<br>
-      • 遗漏平衡补偿分与非线性衰减模型<br>
-      • 博弈论信噪比与方差校准 (SNR-Variance Calibration)<br>
-      • 动量自适应防固化机制与 Softmax 温度缩放 (σ=4.0)
+      • 正交维度解耦(大小 & 单双独立建模)<br>
+      • 威布尔风险率遗漏模型(α=1.8, β=12)<br>
+      • 市场状态自适应切换(香农熵 H 动态融合趋势/回归)<br>
+      • 二阶动量加速度(前/后半段频率差)<br>
+      • 博弈论信噪比校准(tanh SNR 放大)<br>
+      • 动量自适应防固化(近 5 期 Top1 主导 → 35% 惩罚)<br>
+      • Softmax 温度缩放(σ=4.5)
     </div>
   </div>
   <div class="card">
@@ -349,7 +352,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v12_ev',DB_VER=1;let db=null;
+const DB_NAME='pc28_v20',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -457,7 +460,7 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ 高精度 EV-SNR 量化预测模型核心算法 (v12-ev-snr)
+   ★ v20-Master-Edition 高精度全维度量化预测算法(原样保留)
    ================================================================ */
 function runAlgorithm(seq, top1History) {
     const categories = ['大双', '大单', '小双', '小单'];
@@ -478,8 +481,15 @@ function runAlgorithm(seq, top1History) {
         };
     }
 
-    // 1. 动态指数加权趋势分 M(c) (lambda = 0.92，有效窗口约 24 期)
-    const lambda = 0.92;
+    // 解析每个历史元素的属性映射
+    const parsedSeq = seq.map(item => {
+        const isBig = item.includes('大');
+        const isOdd = item.includes('单');
+        return { combo: item, size: isBig ? '大' : '小', parity: isOdd ? '单' : '双' };
+    });
+
+    // 1. 模块一：正交维度解耦建模(大小 & 单双边际概率)
+    const lambda = 0.90;
     let weightSum = 0;
     const weights = [];
     for (let t = 1; t <= N; t++) {
@@ -488,16 +498,37 @@ function runAlgorithm(seq, top1History) {
         weightSum += w;
     }
 
-    const momentum = {};
-    categories.forEach(c => momentum[c] = 0);
+    const sizeMom = { '大': 0, '小': 0 };
+    const parityMom = { '单': 0, '双': 0 };
+    const comboMom = {};
+    categories.forEach(c => comboMom[c] = 0);
+
     for (let i = 0; i < N; i++) {
-        const item = seq[i];
-        if (momentum[item] !== undefined) {
-            momentum[item] += weights[i] / (weightSum + 1e-12);
-        }
+        const p = parsedSeq[i];
+        const wVal = weights[i] / (weightSum + 1e-12);
+        sizeMom[p.size] += wVal;
+        parityMom[p.parity] += wVal;
+        comboMom[p.combo] += wVal;
     }
 
-    // 2. 自适应一阶马尔可夫转移概率 T(c) (平滑系数 alpha = 0.5)
+    // 2. 模块四：二阶动量加速度计算 (Acceleration)
+    const mid = Math.floor(N / 2);
+    const recentSeq = parsedSeq.slice(mid);
+    const historySeq = parsedSeq.slice(0, mid);
+    
+    const recentMom = {};
+    const historyMom = {};
+    categories.forEach(c => { recentMom[c] = 0; historyMom[c] = 0; });
+
+    recentSeq.forEach(p => { if (recentMom[p.combo] !== undefined) recentMom[p.combo] += 1 / recentSeq.length; });
+    historySeq.forEach(p => { if (historyMom[p.combo] !== undefined) historyMom[p.combo] += 1 / historySeq.length; });
+
+    const acceleration = {};
+    categories.forEach(c => {
+        acceleration[c] = recentMom[c] - historyMom[c]; // 加速度
+    });
+
+    // 3. 自适应一阶马尔可夫转移矩阵 (Laplace alpha = 0.5)
     const markovRaw = {};
     categories.forEach(c => markovRaw[c] = 0);
     const lastState = seq[N - 1];
@@ -514,17 +545,15 @@ function runAlgorithm(seq, top1History) {
             }
         }
     }
-
-    const alpha = 0.5;
     const markovScores = {};
     categories.forEach(c => {
-        markovScores[c] = (markovRaw[c] + alpha) / (transitionTotal + categories.length * alpha);
+        markovScores[c] = (markovRaw[c] + 0.5) / (transitionTotal + categories.length * 0.5);
     });
 
-    // 3. 遗漏平衡补偿分 O(c)
+    // 4. 模块二：基于威布尔分布(Weibull Distribution)的遗漏风险率模型
     const omissionCounts = {};
     categories.forEach(c => {
-        let lastIdx = 0; // 1-based 索引
+        let lastIdx = 0;
         for (let i = N - 1; i >= 0; i--) {
             if (seq[i] === c) {
                 lastIdx = i + 1;
@@ -535,19 +564,37 @@ function runAlgorithm(seq, top1History) {
         omissionCounts[c] = g;
     });
 
-    const omissionScores = {};
+    const weibullScores = {};
+    const alphaW = 1.8;
+    const betaW = 12.0;
     categories.forEach(c => {
-        omissionScores[c] = 1.0 - Math.exp(-0.08 * omissionCounts[c]);
+        const g = omissionCounts[c];
+        // 威布尔概率密度/风险率近似表达
+        const ratio = g / betaW;
+        weibullScores[c] = (alphaW / betaW) * Math.pow(ratio, alphaW - 1) * Math.exp(-Math.pow(ratio, alphaW));
     });
 
-    // 4. 基础复合原始得分 Score_raw_base(c)
-    // 权重分配：动量 0.40，马尔可夫 0.35，遗漏 0.25
+    // 5. 模块三：市场状态自适应切换机(计算香农信息熵 H 判定状态)
+    let entropy = 0;
+    categories.forEach(c => {
+        const p = comboMom[c];
+        if (p > 0) entropy -= p * (Math.log(p) / Math.LN2);
+    });
+    const H_norm = Math.min(Math.max(entropy / 2.0, 0), 1.0);
+    const wTrend = 0.5 + 0.3 * Math.tanh(1.5 - H_norm);
+    const wRevert = 1.0 - wTrend;
+
+    // 6. 综合基础得分汇总(整合正交动量、马尔可夫、威布尔遗漏、二阶加速度)
     const scoreRawBase = {};
     categories.forEach(c => {
-        scoreRawBase[c] = 0.40 * momentum[c] + 0.35 * markovScores[c] + 0.25 * omissionScores[c];
+        const orthogBonus = sizeMom[c.includes('大') ? '大' : '小'] * parityMom[c.includes('单') ? '单' : '双'];
+        const trendPart = 0.40 * comboMom[c] + 0.30 * markovScores[c] + 0.30 * orthogBonus;
+        const revertPart = 0.70 * weibullScores[c] + 0.30 * Math.max(0, acceleration[c]);
+        
+        scoreRawBase[c] = wTrend * trendPart + wRevert * revertPart + 0.15 * acceleration[c];
     });
 
-    // 5. 博弈论信噪比与方差校准 SNR(c)(解决对错失衡的核心机制)
+    // 7. 博弈论信噪比与方差校准 (SNR Calibration)
     let sumScore = 0;
     categories.forEach(c => sumScore += scoreRawBase[c]);
     const mu = sumScore / categories.length;
@@ -565,7 +612,7 @@ function runAlgorithm(seq, top1History) {
         scoreRaw[c] = scoreRawBase[c] * snr;
     });
 
-    // 6. 动态反固化检查与纠偏
+    // 8. 动量自适应防固化机制 (Anti-Fixation)
     const L = top1History ? top1History.length : 0;
     const recentTop1 = L > 0 ? top1History.slice(-5) : [];
     const top1Counts = {};
@@ -587,12 +634,12 @@ function runAlgorithm(seq, top1History) {
     if (L >= 3 && recentTop1.length > 0 && (maxTop1Count / recentTop1.length) >= 0.6) {
         fixationTriggered = true;
         if (dominantTop1 && scoreRaw[dominantTop1] !== undefined) {
-            scoreRaw[dominantTop1] *= 0.7; // 施加 30% 衰减惩罚，强制轮换
+            scoreRaw[dominantTop1] *= 0.65; // 施加 35% 惩罚防固化
         }
     }
 
-    // 7. 温度缩放与 Softmax 归一化(温度系数 sigma = 4.0)
-    const sigmaTemp = 4.0;
+    // 9. 温度缩放与 Softmax 归一化(温度系数 sigma = 4.5)
+    const sigmaTemp = 4.5;
     const expScores = {};
     let expSum = 0;
     categories.forEach(c => {
@@ -606,20 +653,18 @@ function runAlgorithm(seq, top1History) {
         finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
     });
 
-    // 8. 排序与结构映射
+    // 10. 排序与映射
     const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
     const top1Raw = ranked[0];
     const main = [ranked[0], ranked[1]];
     const defense = ranked[2];
 
-    // 9. 均衡保护状态判定
     const omValues = Object.values(omissionCounts);
     const maxOm = Math.max(...omValues);
     const minOm = Math.min(...omValues);
     const meanOm = omValues.reduce((a, b) => a + b, 0) / omValues.length;
-    const balancedProtection = (meanOm > 6) && ((maxOm - minOm) >= 12);
+    const balancedProtection = (meanOm > 6) && ((maxOm - minOm) >= 12) || (H_norm > 0.92);
 
-    // 10. 组装指标明细(保留 4 位小数)
     const metrics = {};
     categories.forEach(c => {
         metrics[c] = { score: Number(finalScores[c].toFixed(4)) };
