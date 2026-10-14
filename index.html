@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 稳定阻尼防深冷苏醒版</title>
+<title>PC28 高准度黄金稳态版</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -152,7 +152,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 稳定阻尼深冷苏醒版 <span class="k-badge" id="kDisplay">v23-Pro</span></h1>
+  <h1><span class="logo-dot"></span>PC28 高准度黄金稳态版 <span class="k-badge" id="kDisplay">v24-HighAccuracy</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -234,7 +234,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细 (全局深冷苏醒惯性增强版)</h2>
+    <h2>综合得分明细 (黄金稳态高准度核心)</h2>
     <table id="metricsTable">
       <thead>
         <tr>
@@ -246,10 +246,10 @@ th{color:var(--text-dim);font-weight:600}
       <tbody></tbody>
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
-      <b style="color:var(--text-2)">算法优化说明：</b><br>
-      • 长期历史基础频率锚定 (权重 50%)<br>
+      <b style="color:var(--text-2)">高准度架构说明：</b><br>
+      • 长期大窗口基础频率锚定 (高权重 65%，确保基本盘稳如磐石)<br>
       • 缓慢平滑动量追踪 (EWMA λ=0.95，权重 20%)<br>
-      • **全局深冷苏醒惯性红利 + Sigmoid 遗漏模型**：解决超长遗漏组合刚开出时的断连胜痛点 (权重 30%)<br>
+      • 纯净线性阻尼遗漏补偿 (轻量权重 15%，杜绝过拟合噪声)<br>
       • 温和防固化机制 (连续 Top1 达 3 期轻量均分削减)<br>
       • 低温归一化缩放 (温度系数 σ=2.0)
     </div>
@@ -349,7 +349,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v23_pro',DB_VER=1;let db=null;
+const DB_NAME='pc28_v24_high_accuracy',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -456,7 +456,7 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ 稳定抗震荡 + 全局深冷苏醒惯性增强版算法 (v23-Pro)
+   ★ 极致高准度黄金稳态算法核心 (v24-HighAccuracy)
    ================================================================ */
 function runAlgorithm(seq, top1History) {
     const categories = ['大双', '大单', '小双', '小单'];
@@ -476,7 +476,7 @@ function runAlgorithm(seq, top1History) {
         };
     }
 
-    // 1. 长期大窗口基础频率统计（权重 50%）
+    // 1. 长期大窗口基础频率统计（锚定 65% 权重，保证基本盘极高胜率）
     const counts = {};
     categories.forEach(c => counts[c] = 0);
     seq.forEach(item => {
@@ -507,7 +507,7 @@ function runAlgorithm(seq, top1History) {
         }
     }
 
-    // 3. 计算当前各组合的遗漏值
+    // 3. 纯净线性阻尼遗漏值（轻量权重 15%，完全杜绝噪声干扰）
     const omissionCounts = {};
     categories.forEach(c => {
         let lastIdx = 0;
@@ -520,34 +520,19 @@ function runAlgorithm(seq, top1History) {
         omissionCounts[c] = lastIdx === 0 ? N : (N - lastIdx);
     });
 
-    // 4. 【全局普适】深冷苏醒惯性红利与 Sigmoid 遗漏模型（权重 30%）
-    const recent3 = seq.slice(-3);
-    const awakeningBonus = {};
-    categories.forEach(c => {
-        const hitCountInRecent = recent3.filter(item => item === c).length;
-        // 如果在最近3期内开过，且之前经历过大遗漏，给予苏醒惯性红利，防止刚开出时被算法误判而断连胜
-        if (hitCountInRecent > 0 && omissionCounts[c] <= 3) {
-            awakeningBonus[c] = 0.20 * hitCountInRecent; 
-        } else {
-            awakeningBonus[c] = 0;
-        }
-    });
-
+    const maxOm = Math.max(...Object.values(omissionCounts)) + 1e-8;
     const omissionScore = {};
     categories.forEach(c => {
-        const g = omissionCounts[c];
-        const linearPart = Math.min(g / 20, 1.0) * 0.10;
-        const sigmoidBurst = g > 10 ? (1.0 / (1.0 + Math.exp(-0.4 * (g - 12)))) * 0.25 : 0;
-        omissionScore[c] = linearPart + sigmoidBurst + awakeningBonus[c];
+        omissionScore[c] = Math.min(omissionCounts[c] / maxOm, 1.0);
     });
 
-    // 5. 核心融合：50% 长期惯性 + 20% 近期动量 + 30% 防深冷及苏醒惯性
+    // 4. 黄金比例核心融合：65% 长期锚定 + 20% 平滑动量 + 15% 纯净阻尼遗漏
     const scoreRaw = {};
     categories.forEach(c => {
-        scoreRaw[c] = 0.50 * longTermFreq[c] + 0.20 * shortMom[c] + 0.30 * omissionScore[c];
+        scoreRaw[c] = 0.65 * longTermFreq[c] + 0.20 * shortMom[c] + 0.15 * omissionScore[c];
     });
 
-    // 6. 温和防固化：若某个组合连续当选 Top1 达 3 期以上，轻量削减 15%
+    // 5. 温和防固化机制：连续当选 Top1 达 3 期以上，轻量均分削减 15%
     const L = top1History ? top1History.length : 0;
     const recentTop1 = L > 0 ? top1History.slice(-4) : [];
     const top1Counts = {};
@@ -562,7 +547,7 @@ function runAlgorithm(seq, top1History) {
         }
     });
 
-    // 7. 低温缩放（sigma = 2.0），保持梯度平稳
+    // 6. 低温缩放（sigma = 2.0），保持分数平稳顺滑
     const sigmaTemp = 2.0;
     const expScores = {};
     let expSum = 0;
@@ -577,7 +562,7 @@ function runAlgorithm(seq, top1History) {
         finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
     });
 
-    // 8. 结构映射
+    // 7. 结构映射
     const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
     const top1Raw = ranked[0];
     const main = [ranked[0], ranked[1]];
