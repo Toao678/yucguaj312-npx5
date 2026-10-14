@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 稳定阻尼防深冷版</title>
+<title>PC28 稳定阻尼防深冷苏醒版</title>
 <style>
 :root{
   --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
@@ -152,7 +152,7 @@ th{color:var(--text-dim);font-weight:600}
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 稳定防深冷版 <span class="k-badge" id="kDisplay">v22-AntiCold</span></h1>
+  <h1><span class="logo-dot"></span>PC28 稳定阻尼深冷苏醒版 <span class="k-badge" id="kDisplay">v23-Pro</span></h1>
   <div class="row">
     <span class="label">状态</span>
     <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
@@ -234,7 +234,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-metrics">
   <div class="card">
-    <h2>综合得分明细(稳定抗震荡 + Sigmoid防深冷回补)</h2>
+    <h2>综合得分明细 (全局深冷苏醒惯性增强版)</h2>
     <table id="metricsTable">
       <thead>
         <tr>
@@ -247,9 +247,9 @@ th{color:var(--text-dim);font-weight:600}
     </table>
     <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
       <b style="color:var(--text-2)">算法优化说明：</b><br>
-      • 长期历史大窗口基础频率锚定 (权重 60%)<br>
-      • 缓慢平滑动量追踪 (EWMA λ=0.95，权重 15%)<br>
-      • **Sigmoid 非线性防深冷回补机制**：遗漏超过 10 期后平滑触发回补压强，封堵断连胜缺口 (权重 25%)<br>
+      • 长期历史基础频率锚定 (权重 50%)<br>
+      • 缓慢平滑动量追踪 (EWMA λ=0.95，权重 20%)<br>
+      • **全局深冷苏醒惯性红利 + Sigmoid 遗漏模型**：解决超长遗漏组合刚开出时的断连胜痛点 (权重 30%)<br>
       • 温和防固化机制 (连续 Top1 达 3 期轻量均分削减)<br>
       • 低温归一化缩放 (温度系数 σ=2.0)
     </div>
@@ -262,7 +262,7 @@ th{color:var(--text-dim);font-weight:600}
 
 <div class="tab-content" id="tab-history">
   <div class="card">
-    <h2>预测对错记录(最近 50 期)</h2>
+    <h2>预测对错记录 (最近 50 期)</h2>
     <div class="summary" id="summaryBox"></div>
     <div style="overflow-x:auto;margin-top:10px">
       <table id="historyTable" class="history-table">
@@ -349,7 +349,7 @@ function comboClass(combo){
 /* ================================================================
    IndexedDB
    ================================================================ */
-const DB_NAME='pc28_v22_anticold',DB_VER=1;let db=null;
+const DB_NAME='pc28_v23_pro',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -388,7 +388,6 @@ async function fetchDraws(){
       if(!res.ok)throw new Error('HTTP '+res.status);
       const json=await res.json();
       if(json.message!=='success'||!Array.isArray(json.data))throw new Error('格式异常');
-      console.log('[API 成功]',api.url);
       return json.data.map(item=>{
         let nums,sum,combo,dateStr,timeStr,ts;
         if(item.number&&item.number.includes('+')&&!item.number.includes('=')){
@@ -414,7 +413,7 @@ async function fetchDraws(){
           sum_val:sum,size,parity,combo:combo||(size+parity),
         };
       });
-    }catch(e){console.warn('[API 失败]',api.url,e.message);lastErr=e;}
+    }catch(e){lastErr=e;}
   }
   throw lastErr||new Error('所有接口都失败');
 }
@@ -457,7 +456,7 @@ function renderCountdown(){
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
 /* ================================================================
-   ★ 稳定抗震荡 + Sigmoid防深冷回补版预测算法
+   ★ 稳定抗震荡 + 全局深冷苏醒惯性增强版算法 (v23-Pro)
    ================================================================ */
 function runAlgorithm(seq, top1History) {
     const categories = ['大双', '大单', '小双', '小单'];
@@ -477,7 +476,7 @@ function runAlgorithm(seq, top1History) {
         };
     }
 
-    // 1. 长期大窗口基础频率统计（锚定 60% 权重，保持极强的稳定性）
+    // 1. 长期大窗口基础频率统计（权重 50%）
     const counts = {};
     categories.forEach(c => counts[c] = 0);
     seq.forEach(item => {
@@ -489,7 +488,7 @@ function runAlgorithm(seq, top1History) {
         longTermFreq[c] = counts[c] / N;
     });
 
-    // 2. 近期指数加权平滑动量（EWMA λ = 0.95，权重 15%）
+    // 2. 近期指数加权平滑动量（EWMA λ = 0.95，权重 20%）
     const lambda = 0.95;
     let weightSum = 0;
     const weights = [];
@@ -508,8 +507,7 @@ function runAlgorithm(seq, top1History) {
         }
     }
 
-    // 3. Sigmoid 非线性防深冷回补模型（权重 25%）
-    // 专门解决“连续多期未出组合突然爆发打断连胜”的痛点
+    // 3. 计算当前各组合的遗漏值
     const omissionCounts = {};
     categories.forEach(c => {
         let lastIdx = 0;
@@ -522,22 +520,34 @@ function runAlgorithm(seq, top1History) {
         omissionCounts[c] = lastIdx === 0 ? N : (N - lastIdx);
     });
 
+    // 4. 【全局普适】深冷苏醒惯性红利与 Sigmoid 遗漏模型（权重 30%）
+    const recent3 = seq.slice(-3);
+    const awakeningBonus = {};
+    categories.forEach(c => {
+        const hitCountInRecent = recent3.filter(item => item === c).length;
+        // 如果在最近3期内开过，且之前经历过大遗漏，给予苏醒惯性红利，防止刚开出时被算法误判而断连胜
+        if (hitCountInRecent > 0 && omissionCounts[c] <= 3) {
+            awakeningBonus[c] = 0.20 * hitCountInRecent; 
+        } else {
+            awakeningBonus[c] = 0;
+        }
+    });
+
     const omissionScore = {};
     categories.forEach(c => {
         const g = omissionCounts[c];
-        // 基础线性部分 + 当遗漏 g > 10 时平滑触发 Sigmoid 突发回补激励
         const linearPart = Math.min(g / 20, 1.0) * 0.10;
         const sigmoidBurst = g > 10 ? (1.0 / (1.0 + Math.exp(-0.4 * (g - 12)))) * 0.25 : 0;
-        omissionScore[c] = linearPart + sigmoidBurst;
+        omissionScore[c] = linearPart + sigmoidBurst + awakeningBonus[c];
     });
 
-    // 4. 核心融合：60% 长期惯性 + 15% 近期动量 + 25% 防深冷回补遗漏
+    // 5. 核心融合：50% 长期惯性 + 20% 近期动量 + 30% 防深冷及苏醒惯性
     const scoreRaw = {};
     categories.forEach(c => {
-        scoreRaw[c] = 0.60 * longTermFreq[c] + 0.15 * shortMom[c] + 0.25 * omissionScore[c];
+        scoreRaw[c] = 0.50 * longTermFreq[c] + 0.20 * shortMom[c] + 0.30 * omissionScore[c];
     });
 
-    // 5. 温和防固化：若某个组合连续当选 Top1 达 3 期以上，轻量削减 15%
+    // 6. 温和防固化：若某个组合连续当选 Top1 达 3 期以上，轻量削减 15%
     const L = top1History ? top1History.length : 0;
     const recentTop1 = L > 0 ? top1History.slice(-4) : [];
     const top1Counts = {};
@@ -552,7 +562,7 @@ function runAlgorithm(seq, top1History) {
         }
     });
 
-    // 6. 低温缩放（sigma = 2.0），保持梯度温和
+    // 7. 低温缩放（sigma = 2.0），保持梯度平稳
     const sigmaTemp = 2.0;
     const expScores = {};
     let expSum = 0;
@@ -567,7 +577,7 @@ function runAlgorithm(seq, top1History) {
         finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
     });
 
-    // 7. 结构映射
+    // 8. 结构映射
     const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
     const top1Raw = ranked[0];
     const main = [ranked[0], ranked[1]];
@@ -642,7 +652,6 @@ async function rebuildHistoryFromDraws(){
     });
   }
   if (newPreds.length) await dbPutMany('preds', newPreds);
-  console.log(`[历史重建] 可用 ${n} 期，新增 ${newPreds.length} 条`);
   return newPreds.length;
 }
 
@@ -775,7 +784,7 @@ function getNextIssue(){
 }
 
 /* ================================================================
-   复制(含期号)
+   复制
    ================================================================ */
 function copyPrediction(){
   if (!state.currentPred) { setStatus('暂无预测可复制', 'warn'); return; }
@@ -791,10 +800,10 @@ function copyPrediction(){
     setStatus('已复制：' + text, 'ok');
     setTimeout(() => { btn.textContent = orig; btn.style.animation = ''; }, 1500);
   };
-  const onFail = (e) => { setStatus('复制失败，请长按选择', 'warn'); console.warn(e); };
+  const onFail = (e) => { setStatus('复制失败，请长按选择', 'warn'); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(onSuccess).catch(() => { fallbackCopy(text) ? onSuccess() : onFail('fallback failed'); });
-  } else { fallbackCopy(text) ? onSuccess() : onFail('no clipboard'); }
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => { fallbackCopy(text) ? onSuccess() : onFail(); });
+  } else { fallbackCopy(text) ? onSuccess() : onFail(); }
 }
 function fallbackCopy(text){
   const ta = document.createElement('textarea');
@@ -966,7 +975,6 @@ function renderHistoryPage(filled, issueToNext){
         pattern = detectPattern(nextDraw.num_a, nextDraw.num_b, nextDraw.num_c);
       }
 
-      // 组装上一期预测答案展示文本
       const mainStr = Array.isArray(p.main) ? p.main.join('·') : (p.main || '');
       const defStr = p.defense ? `(防:${p.defense})` : '';
       const predContent = `<span style="font-size:10px;color:var(--text-2);font-weight:700;">${mainStr} ${defStr}</span>`;
@@ -1034,7 +1042,6 @@ function renderPrediction(pred){
   fixEl.textContent = msgs.join('  |  ');
   fixEl.className = msgs.length ? 'warn' : '';
 
-  // 得分明细表
   const tbody = document.querySelector('#metricsTable tbody');
   tbody.innerHTML = '';
   pred.ranked.forEach((c, idx) => {
@@ -1051,7 +1058,6 @@ function renderPrediction(pred){
     tbody.appendChild(tr);
   });
 
-  // 4 个卡片
   const boxes = document.getElementById('metricBoxes');
   boxes.innerHTML = '';
   pred.ranked.forEach((c, idx) => {
