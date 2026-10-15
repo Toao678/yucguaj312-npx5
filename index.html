@@ -3,237 +3,169 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>PC28 巅峰大师精准稳赢版 v32</title>
+<title>PC28 极致精准马尔可夫版</title>
 <style>
 :root{
-  --bg: #f8fafc;
-  --card: rgba(255, 255, 255, 0.88);
-  --card-border: rgba(226, 232, 240, 0.9);
-  --text: #0f172a;
-  --text-2: #334155;
-  --text-dim: #64748b;
-  --accent: #2563eb;
-  --green: #059669;
-  --red: #dc2626;
-  --yellow: #d97706;
-  --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+  --bg:#f2f4f8;--card:#ffffff;--card-2:#f8fafc;
+  --border:#e3e8f0;--border-strong:#d0d8e4;
+  --text:#1c2333;--text-2:#4a5568;--text-dim:#8b96a8;--text-faint:#a8b1c1;
+  --accent:#3b82f6;--accent-2:#8b5cf6;
+  --green:#10b981;--green-bg:#d1fae5;
+  --red:#ef4444;--red-bg:#fee2e2;
+  --yellow:#f59e0b;--yellow-bg:#fef3c7;
+  --purple:#8b5cf6;--purple-bg:#ede9fe;
+  --blue:#3b82f6;--blue-bg:#dbeafe;
+  --shadow-sm:0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04);
+  --shadow-md:0 4px 12px rgba(15,23,42,0.08),0 2px 4px rgba(15,23,42,0.04);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;overflow-x:hidden}
-body{
-  padding:10px;
-  background-color: var(--bg);
-  background-image: 
-    linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
-  background-size: 24px 24px;
-  background-attachment: fixed;
-  color: var(--text);
-  font-family: -apple-system, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
-  font-size: 12px;
-  line-height: 1.5;
-  min-height: 100vh;
-  padding-bottom: 30px;
-  -webkit-font-smoothing: antialiased;
-}
-.card{
-  background: var(--card);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 14px;
-  margin-bottom: 10px;
-  box-shadow: var(--shadow);
-  width: 100%;
-  overflow: hidden;
-}
-h1{
-  font-size: 15px; margin: 0 0 8px; color: var(--text); font-weight: 800;
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-}
-h1 .logo-dot{
-  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-  box-shadow: 0 0 8px rgba(37,99,235,0.4);
-}
-h2{
-  font-size: 12px; margin: 0 0 8px; color: var(--text);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06); padding-bottom: 6px;
-  display: flex; justify-content: space-between; align-items: center; font-weight: 700;
-}
-h2 .h2-title{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html,body{margin:0;padding:0}
+body{padding:10px;background:linear-gradient(180deg,#f7f9fc 0%,#eef2f8 100%);background-attachment:fixed;color:var(--text);font-family:-apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;font-size:13px;line-height:1.55;min-height:100vh;padding-bottom:24px;-webkit-font-smoothing:antialiased}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow-md)}
+h1{font-size:16px;margin:0 0 8px;color:var(--text);font-weight:800;letter-spacing:0.3px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+h1 .logo-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#8b5cf6);box-shadow:0 0 8px rgba(59,130,246,0.5)}
+h2{font-size:13px;margin:0 0 10px;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:6px;font-weight:700}
+h2 .h2-title{flex:1;font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 h2 .h2-title b{color:var(--accent);font-weight:800}
-h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:10px;margin-left:4px}
-
+h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:11px;margin-left:4px}
 .row{display:flex;justify-content:space-between;margin:5px 0;align-items:center}
-.label{color:var(--text-dim);font-size:11px}
+.label{color:var(--text-dim);font-size:12px;font-weight:500}
 .value{font-weight:700;color:var(--text)}
-
-/* 关键：绝对禁止左右滑动，强制宽度100% */
-.table-container{
-  width: 100%;
-  overflow-x: hidden;
-}
-.history-table{
-  width: 100%;
-  table-layout: fixed;
-  border-collapse: collapse;
-  font-size: 9px;
-}
-.history-table th{
-  padding: 8px 1px;
-  text-align: center;
-  color: var(--text-2);
-  font-weight: 700;
-  background: rgba(241, 245, 249, 0.95);
-  border-bottom: 2px solid #e2e8f0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.history-table td{
-  padding: 6px 1px;
-  text-align: center;
-  border-bottom: 1px solid #f1f5f9;
-  color: var(--text);
-  font-weight: 500;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.issue-cell{color:var(--text-dim);font-weight:600}
-.time-cell{font-variant-numeric:tabular-nums;color:var(--text-2)}
-.nums-cell{font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
-.hit{color:var(--green);font-weight:700}
-.miss{color:var(--red);font-weight:700}
-.pending-row td{background:rgba(37,99,235,0.06)!important;font-weight:700}
-
-.btn{
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff; border: none; border-radius: 8px;
-  padding: 7px 14px; font-size: 11px; cursor: pointer; font-weight: 700;
-  box-shadow: 0 3px 10px rgba(37,99,235,0.25);
-}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:4px 2px;text-align:center;border-bottom:1px solid var(--border)}
+th{color:var(--text-dim);font-weight:600}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+.hit{color:var(--green)}.miss{color:var(--red)}.empty{color:var(--text-dim)}
+.btn{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;cursor:pointer;margin:2px;font-weight:700;box-shadow:0 2px 8px rgba(59,130,246,0.35);transition:all .15s}
 .btn:active{transform:scale(0.97)}
-.btn-copy{
-  background: linear-gradient(135deg, #7c3aed, #6d28d9);
-  padding: 4px 10px; font-size: 10px; border-radius: 6px;
-  font-weight: 700; color:#fff; cursor:pointer; border:none;
-}
-.btn-scratch{
-  background: linear-gradient(135deg, #06b6d4, #0891b2);
-  padding: 4px 10px; font-size: 10px; border-radius: 6px; color: #fff;
-  border: none; cursor: pointer; font-weight: 700;
-}
-
-.status{font-size:10px;color:var(--text-dim);margin-top:4px}
-.pulse{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px;animation:p 1.8s infinite}
-@keyframes p{0%{box-shadow:0 0 0 0 rgba(5,150,105,0.5)}50%{box-shadow:0 0 0 5px rgba(5,150,105,0)}100%{box-shadow:0 0 0 0 rgba(5,150,105,0)}}
-
+.btn-copy{background:linear-gradient(135deg,#8b5cf6,#7c3aed);padding:5px 14px;font-size:11px;border-radius:8px;box-shadow:0 2px 8px rgba(139,92,246,0.35);font-weight:700}
+.btn-copy:active{transform:scale(0.96)}
+.btn-scratch{background:linear-gradient(135deg,#06b6d4,#0891b2);padding:5px 14px;font-size:11px;border-radius:8px;color:#fff;border:none;cursor:pointer;flex-shrink:0;font-weight:700;box-shadow:0 2px 8px rgba(6,182,212,0.35)}
+.btn-scratch:active{transform:scale(0.96)}
+.status{font-size:11px;color:var(--text-dim);margin-top:6px}
+.pulse{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;box-shadow:0 0 0 0 rgba(16,185,129,0.6);animation:p 1.8s infinite}
+@keyframes p{0%{box-shadow:0 0 0 0 rgba(16,185,129,0.6)}50%{box-shadow:0 0 0 6px rgba(16,185,129,0)}100%{box-shadow:0 0 0 0 rgba(16,185,129,0)}}
+@keyframes copied{0%{transform:scale(1)}30%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
 .tab-bar{display:flex;gap:6px;margin-bottom:10px}
-.tab{
-  flex: 1; padding: 8px 4px; text-align: center;
-  background: rgba(255, 255, 255, 0.6); border: 1px solid var(--card-border);
-  border-radius: 10px; font-size: 11px; cursor: pointer; color: var(--text-2); font-weight: 700;
-}
-.tab.active{
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #fff; border-color: transparent;
-  box-shadow: 0 4px 10px rgba(37,99,235,0.3);
-}
-.tab-content{display:none}.tab-content.active{display:block}
+.tab{flex:1;padding:9px 6px;text-align:center;background:#fff;border:1.5px solid var(--border);border-radius:12px;font-size:12px;cursor:pointer;color:var(--text-2);font-weight:700;transition:all .2s;box-shadow:var(--shadow-sm)}
+.tab.active{background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border-color:transparent;box-shadow:0 4px 12px rgba(59,130,246,0.4)}
+.tab-content{display:none}.tab-content.active{display:block;animation:fadeIn .25s ease}
+.metrics-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px}
+.metric-box{background:linear-gradient(135deg,#f0f5ff 0%,#ede9fe 100%);border:1px solid #e0e7ff;border-radius:12px;padding:10px 8px;text-align:center;box-shadow:var(--shadow-sm);position:relative}
+.metric-box .mv{font-size:22px;font-weight:900;color:#4f46e5;font-variant-numeric:tabular-nums}
+.metric-box .ml{font-size:10px;color:var(--text-dim);margin-top:2px;font-weight:700;letter-spacing:0.5px}
+.metric-box.rank1{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-color:#6ee7b7}
+.metric-box.rank1 .mv{color:#047857}
+.metric-box.rank2{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#fbbf24}
+.metric-box.rank2 .mv{color:#b45309}
+.k-badge{display:inline-block;padding:3px 10px;border-radius:10px;background:linear-gradient(135deg,#ede9fe,#dbeafe);border:1px solid #c7d2fe;color:#6d28d9;font-weight:800;font-size:11px}
+.warn{color:var(--yellow)}
+.summary{background:linear-gradient(135deg,#f8fafc,#f0f5ff);border:1px solid var(--border);border-radius:12px;padding:10px;margin-top:10px;display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:8px}
+.summary .sv{font-size:17px;font-weight:800;color:var(--text)}
+.summary .sl{font-size:10px;color:var(--text-dim);margin-top:1px;font-weight:600}
+.cd-box{background:linear-gradient(135deg,#eff6ff 0%,#f5f3ff 100%);border:1px solid #e0e7ff;border-radius:14px;padding:12px;margin-top:8px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,0.8)}
+.cd-label{font-size:11px;color:var(--text-dim);margin-bottom:4px;letter-spacing:0.5px;font-weight:600}
+.cd-time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;color:#4f46e5;letter-spacing:2px;line-height:1.1;text-shadow:0 2px 8px rgba(79,70,229,0.15)}
+.cd-time.urgent{color:#ef4444;text-shadow:0 2px 8px rgba(239,68,68,0.2);animation:p .8s infinite}
+.cd-time.soon{color:#f59e0b}
+.cd-sub{font-size:10px;color:var(--text-dim);margin-top:6px;font-weight:500}
+.progress-wrap{margin-top:10px;background:#e9edf4;border-radius:10px;height:10px;overflow:hidden;border:1px solid var(--border);box-shadow:inset 0 1px 2px rgba(15,23,42,0.06)}
+.progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#10b981);transition:width .3s linear;border-radius:10px;box-shadow:0 0 8px rgba(59,130,246,0.5)}
+.progress-bar.soon{background:linear-gradient(90deg,#f59e0b,#fb923c)}
+.progress-bar.urgent{background:linear-gradient(90deg,#ef4444,#dc2626);animation:p .8s infinite}
+.progress-labels{display:flex;justify-content:space-between;font-size:10px;color:var(--text-faint);margin-top:4px;font-weight:600}
 
-.k-badge{
-  display: inline-block; padding: 2px 8px; border-radius: 8px;
-  background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.25);
-  color: #7c3aed; font-weight: 800; font-size: 10px;
-}
+.pred-line{display:flex;justify-content:center;align-items:baseline;gap:10px;padding:16px 6px;font-weight:800;font-size:clamp(14px,4.2vw,18px);letter-spacing:0.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pred-line .issue-tag{color:#4f46e5;font-weight:900;flex-shrink:0;margin-right:2px}
+.pred-line .item{display:inline-flex;align-items:baseline;flex-shrink:0}
+.pred-line .lbl{font-weight:600;color:var(--text-dim);font-size:.8em;margin-right:4px}
+.pred-line .main-val{color:#059669}
+.pred-line .def-val{color:#d97706}
+.pred-line .pipe{color:#cbd5e1;font-weight:400;font-size:.85em;flex-shrink:0}
 
-.summary{
-  background: rgba(241, 245, 249, 0.7); border: 1px solid var(--card-border);
-  border-radius: 10px; padding: 8px; margin-top: 8px; display: flex;
-  justify-content: space-around; text-align: center; flex-wrap: wrap; gap: 4px;
-}
-.summary .sv{font-size:15px;font-weight:800;color:var(--text)}
-.summary .sl{font-size:9px;color:var(--text-dim);margin-top:1px;font-weight:600}
-
-.cd-box{
-  background: linear-gradient(135deg, rgba(37,99,235,0.06), rgba(124,58,237,0.06));
-  border: 1px solid rgba(37,99,235,0.15); border-radius: 12px;
-  padding: 10px; margin-top: 6px; text-align: center;
-}
-.cd-label{font-size:10px;color:var(--text-2);margin-bottom:2px;font-weight:600}
-.cd-time{font-size:28px;font-weight:900;color:#2563eb;letter-spacing:1px;line-height:1.1}
-.cd-time.urgent{color:#dc2626;animation:p .8s infinite}
-.cd-sub{font-size:9px;color:var(--text-dim);margin-top:4px}
-.progress-wrap{margin-top:8px;background:rgba(0,0,0,0.06);border-radius:6px;height:6px;overflow:hidden}
-.progress-bar{height:100%;background:linear-gradient(90deg,#2563eb,#059669);transition:width .3s linear;border-radius:6px}
-.progress-bar.urgent{background:linear-gradient(90deg,#dc2626,#ef4444)}
-.progress-labels{display:flex;justify-content:space-between;font-size:9px;color:var(--text-dim);margin-top:3px}
-
-.pred-card-box{
-  background: rgba(241, 245, 249, 0.7);
-  border: 1px solid var(--card-border); border-radius: 12px; padding: 10px; margin-top: 6px;
-}
-.pred-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.08);white-space:nowrap}
-.pred-row:last-child{border-bottom:none}
-.pred-title{font-weight:800;color:var(--text-2);font-size:11px}
-.pred-content{font-weight:900;font-size:11px;white-space:nowrap}
-.val-high{color:#059669;background:rgba(5,150,105,0.1);padding:2px 6px;border-radius:6px;border:1px solid rgba(5,150,105,0.2)}
-.val-low{color:#d97706;background:rgba(217,119,6,0.1);padding:2px 6px;border-radius:6px;border:1px solid rgba(217,119,6,0.2)}
-.val-main{color:#2563eb}
-.val-def{color:#d97706}
-
-.scratch-wrap{
-  position: relative; margin-top: 6px; border-radius: 14px; overflow: hidden;
-  background: rgba(241, 245, 249, 0.7); border: 1px solid var(--card-border); min-height: 95px;
-}
-.scratch-under{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px 4px}
-.num-row{display:flex;align-items:center;justify-content:center;gap:3px;flex-wrap:nowrap;width:100%}
-.num-box{width:38px;height:38px;background:#ffffff;color:var(--text);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;border:1px solid #cbd5e1;flex-shrink:0}
-.op{font-size:14px;font-weight:800;color:var(--text-dim);padding:0 2px;flex-shrink:0}
-.sum-box{width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:#fff;background:linear-gradient(135deg,#2563eb,#1d4ed8);flex-shrink:0}
-.sep{width:0;height:26px;border-left:2px dotted #cbd5e1;margin:0 6px;flex-shrink:0}
-.size-box{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff;flex-shrink:0}
-.size-big{background:linear-gradient(135deg,#dc2626,#b91c1c)}
-.size-small{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
-.parity-odd{background:linear-gradient(135deg,#2563eb,#1d4ed8)}
-.parity-even{background:linear-gradient(135deg,#dc2626,#b91c1c)}
-#scratchCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;display:none;border-radius:14px}
+.scratch-wrap{position:relative;margin-top:8px;border-radius:16px;overflow:hidden;background:linear-gradient(135deg,#f8fafc 0%,#f1f5f9 100%);border:1px solid var(--border);min-height:110px;box-shadow:inset 0 1px 0 rgba(255,255,255,0.9)}
+.scratch-under{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:14px 6px}
+.num-row{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:nowrap;width:100%}
+.num-box{width:46px;height:46px;background:#fff;color:#1c2333;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:900;border:1.5px solid var(--border);box-shadow:0 2px 6px rgba(15,23,42,0.06),inset 0 -2px 0 rgba(15,23,42,0.04);flex-shrink:0;font-family:-apple-system,"PingFang SC",sans-serif}
+.op{font-size:16px;font-weight:800;color:var(--text-faint);padding:0 2px;flex-shrink:0}
+.sum-box{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:900;color:#fff;background:linear-gradient(135deg,#3b82f6,#2563eb);box-shadow:0 4px 12px rgba(59,130,246,0.4);flex-shrink:0;font-family:-apple-system,"PingFang SC",sans-serif}
+.sep{width:0;height:32px;border-left:2px dotted #cbd5e1;margin:0 8px;flex-shrink:0}
+.size-box{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:900;color:#fff;box-shadow:0 4px 12px rgba(15,23,42,0.15);flex-shrink:0;font-family:-apple-system,"PingFang SC",sans-serif}
+.size-big{background:linear-gradient(135deg,#ef4444,#dc2626)}
+.size-small{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.parity-odd{background:linear-gradient(135deg,#3b82f6,#2563eb)}
+.parity-even{background:linear-gradient(135deg,#ef4444,#dc2626)}
+#scratchCanvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none;display:none;border-radius:16px}
 #scratchCanvas.active{display:block}
-
-.trend-wrap{max-height:480px;overflow-y:auto;border-radius:10px;background:rgba(255,255,255,0.5);border:1px solid var(--card-border)}
-.trend-table{width:100%;border-collapse:collapse;font-size:10px;white-space:nowrap}
-.trend-table th{position:sticky;top:0;background:rgba(241,245,249,0.95);color:var(--text-2);padding:6px 1px;font-weight:700;z-index:2}
-.trend-table td{padding:4px 1px;text-align:center;border-bottom:1px solid #f1f5f9;height:24px;vertical-align:middle;white-space:nowrap}
-.trend-table tr.latest td{background:rgba(37,99,235,0.08)}
-.trend-table .issue{color:var(--text-dim);font-size:9px;font-weight:600}
-.trend-table .val{font-weight:800;color:var(--text)}
-.tag{display:inline-block;padding:1px 4px;border-radius:4px;font-size:9px;font-weight:800}
-.tag-big{background:rgba(220,38,38,0.12);color:#dc2626}
-.tag-small{background:rgba(37,99,235,0.12);color:#2563eb}
-.tag-odd{background:rgba(37,99,235,0.12);color:#2563eb}
-.tag-even{background:rgba(220,38,38,0.12);color:#dc2626}
-
-.pager{display:flex;justify-content:center;align-items:center;gap:6px;margin-top:10px;padding:6px;background:rgba(241,245,249,0.7);border:1px solid var(--card-border);border-radius:8px}
-.pager-btn{background:#ffffff;border:1px solid #cbd5e1;color:var(--text);border-radius:6px;padding:5px 10px;font-size:11px;font-weight:700;cursor:pointer}
-.pager-btn:disabled{opacity:0.3;cursor:not-allowed}
-.pager-info{font-size:11px;font-weight:700;color:var(--text)}
-.pager-info .cur{color:var(--accent);font-weight:900}
+.trend-wrap{max-height:520px;overflow-y:auto;border-radius:12px;background:#fff;border:1px solid var(--border);box-shadow:var(--shadow-sm)}
+.trend-table{width:100%;border-collapse:collapse;font-size:11px}
+.trend-table th{position:sticky;top:0;background:#f8fafc;color:var(--text-dim);padding:8px 1px;font-weight:700;z-index:2;font-size:10px;border-bottom:1.5px solid var(--border)}
+.trend-table td{padding:4px 1px;text-align:center;border-bottom:1px solid #f1f5f9;height:24px;vertical-align:middle}
+.trend-table tr.latest td{background:#eff6ff}
+.trend-table tr.latest .issue{color:var(--accent);font-weight:800}
+.trend-table tr.hidden td{color:var(--text-faint)!important;font-style:italic}
+.trend-table tr.hidden .tag{display:none}
+.trend-table tr.hidden .hidden-q{display:inline-block;color:var(--text-faint);font-weight:800;font-size:14px}
+.trend-table .issue{color:var(--text-dim);font-size:10px;font-weight:600}
+.trend-table .val{font-weight:800;font-variant-numeric:tabular-nums;color:var(--text)}
+.trend-table .tag{display:inline-block;padding:1px 6px;border-radius:5px;font-size:10px;min-width:18px;line-height:16px;font-weight:800}
+.tag-big{background:var(--red-bg);color:#b91c1c}
+.tag-small{background:var(--blue-bg);color:#1d4ed8}
+.tag-odd{background:var(--blue-bg);color:#1d4ed8}
+.tag-even{background:var(--red-bg);color:#b91c1c}
+.tag-combo-big{background:var(--red-bg);color:#b91c1c}
+.tag-combo-small{background:var(--blue-bg);color:#1d4ed8}
+.trend-empty{padding:24px;text-align:center;color:var(--text-dim);font-size:12px}
+.hidden-q{display:none}
+.history-table{font-size:11px}
+.history-table th{padding:7px 1px;font-size:10px;color:var(--text-dim);font-weight:700}
+.history-table td{padding:5px 1px;font-size:10px}
+.history-table .issue-cell{font-size:10px;color:var(--text-2);font-variant-numeric:tabular-nums;font-weight:600}
+.history-table .time-cell{font-size:10px;color:var(--text-dim);font-variant-numeric:tabular-nums}
+.history-table .nums-cell{font-size:10px;font-variant-numeric:tabular-nums;font-weight:800;color:var(--text)}
+.pattern-tag{display:inline-block;padding:2px 6px;border-radius:5px;font-size:9px;font-weight:800}
+.pt-baozi{background:var(--purple-bg);color:#6d28d9}
+.pt-shunzi{background:#cffafe;color:#0e7490}
+.pt-duizi{background:var(--yellow-bg);color:#b45309}
+.pt-zaliu{background:#f1f5f9;color:#64748b}
+.combo-tag{display:inline-block;padding:2px 8px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:0.5px;min-width:32px}
+.combo-dadian{background:#fee2e2;color:#b91c1c}
+.combo-dashuang{background:#fed7aa;color:#c2410c}
+.combo-xiaodian{background:#dbeafe;color:#1d4ed8}
+.combo-xiaoshuang{background:#cffafe;color:#0e7490}
+.pager{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:12px;padding:8px;background:linear-gradient(135deg,#f8fafc,#f0f5ff);border:1px solid var(--border);border-radius:10px}
+.pager-btn{background:#fff;border:1.5px solid var(--border-strong);color:var(--text-2);border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;min-width:64px;box-shadow:var(--shadow-sm)}
+.pager-btn:active{transform:scale(0.96)}
+.pager-btn:disabled{opacity:0.4;cursor:not-allowed}
+.pager-info{font-size:12px;font-weight:700;color:var(--text);padding:0 8px;font-variant-numeric:tabular-nums;min-width:80px;text-align:center}
+.pager-info .cur{color:var(--accent);font-weight:900;font-size:14px}
+.pager-info .total{color:var(--text-dim)}
+.pattern-stats{background:linear-gradient(135deg,#f8fafc,#f0f5ff);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:10px;display:flex;justify-content:space-around;text-align:center;flex-wrap:wrap;gap:8px}
+.pattern-stat-item{display:flex;flex-direction:column;align-items:center;gap:4px;min-width:50px}
+.pattern-stat-val{font-size:18px;font-weight:900;color:var(--text)}
+.pattern-stat-lbl{font-size:9px;font-weight:800}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
 </style>
 </head>
 <body>
 
 <div class="card">
-  <h1><span class="logo-dot"></span>PC28 巅峰大师精准稳赢版 <span class="k-badge">v32-HMS</span></h1>
-  <div class="row"><span class="label">运行状态</span><span class="value"><span class="pulse"></span><span id="statusText">零观望实时全开</span></span></div>
-  <div class="row"><span class="label">最新期号</span><span class="value" id="latestIssue">-</span></div>
+  <h1><span class="logo-dot"></span>PC28 极致精准马尔可夫版 <span class="k-badge" id="kDisplay">v25-MarkovPrecision</span></h1>
+  <div class="row">
+    <span class="label">状态</span>
+    <span class="value"><span class="pulse"></span><span id="statusText">初始化</span></span>
+  </div>
+  <div class="row">
+    <span class="label">最新期号</span>
+    <span class="value" id="latestIssue">-</span>
+  </div>
 
   <div class="cd-box">
     <div class="cd-label">下期开奖倒计时</div>
     <div class="cd-time" id="countdown">--:--</div>
-    <div class="cd-sub" id="cdSub">等待数据同步...</div>
+    <div class="cd-sub" id="cdSub">等待数据...</div>
     <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
     <div class="progress-labels"><span id="cdStart">--:--</span><span id="cdEnd">--:--</span></div>
   </div>
@@ -248,10 +180,14 @@ h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:10px;mar
   <div class="scratch-wrap" id="scratchWrap">
     <div class="scratch-under">
       <div class="num-row">
-        <div class="num-box" id="lrA">?</div><div class="op">+</div>
-        <div class="num-box" id="lrB">?</div><div class="op">+</div>
-        <div class="num-box" id="lrC">?</div><div class="op">=</div>
-        <div class="sum-box" id="lrSum">?</div><div class="sep"></div>
+        <div class="num-box" id="lrA">?</div>
+        <div class="op">+</div>
+        <div class="num-box" id="lrB">?</div>
+        <div class="op">+</div>
+        <div class="num-box" id="lrC">?</div>
+        <div class="op">=</div>
+        <div class="sum-box" id="lrSum">?</div>
+        <div class="sep"></div>
         <div class="size-box size-small" id="lrSize">?</div>
         <div class="size-box parity-odd" id="lrParity">?</div>
       </div>
@@ -262,33 +198,25 @@ h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:10px;mar
 
 <div class="card">
   <h2>
-    <span class="h2-title" style="color:#2563eb;font-weight:800">🎯 本期顶尖高精度大师预测</span>
-    <button class="btn btn-copy" id="copyBtn" onclick="copyPrediction()">📋 复制全部</button>
+    <span class="h2-title" style="color:#4f46e5;font-weight:800">本期预测</span>
+    <button class="btn btn-copy" id="copyBtn" onclick="copyPrediction()">📋 复制</button>
   </h2>
-  <div class="pred-card-box">
-    <div class="pred-row">
-      <span class="pred-title">组合预测：</span>
-      <span class="pred-content"><span class="val-main" id="predMain">-</span> | <span class="val-def" id="predDef">-</span></span>
-    </div>
-    <div class="pred-row">
-      <span class="pred-title">🔥 高置信度 (2和值)：</span>
-      <span class="pred-content val-high" id="predHighSum">-</span>
-    </div>
-    <div class="pred-row">
-      <span class="pred-title">🛡️ 低置信度 (3备选)：</span>
-      <span class="pred-content val-low" id="predLowSum">-</span>
-    </div>
+  <div class="pred-line" id="predLine">
+    <span class="item"><span class="lbl">主攻：</span><span class="main-val">-</span></span>
+    <span class="item"><span class="lbl">防守：</span><span class="def-val">-</span></span>
   </div>
+  <div style="text-align:center;margin-top:2px;font-size:11px;color:var(--text-dim)" id="fixationMsg"></div>
 </div>
 
 <div class="tab-bar">
   <div class="tab active" data-tab="trend" onclick="switchTab('trend')">走势图</div>
-  <div class="tab" data-tab="history" onclick="switchTab('history')">预测记录表</div>
+  <div class="tab" data-tab="metrics" onclick="switchTab('metrics')">得分明细</div>
+  <div class="tab" data-tab="history" onclick="switchTab('history')">对错记录</div>
 </div>
 
 <div class="tab-content active" id="tab-trend">
   <div class="card">
-    <h2>最近 100 期走势矩阵</h2>
+    <h2>最近 100 期走势</h2>
     <div class="trend-wrap">
       <table class="trend-table">
         <thead>
@@ -304,20 +232,48 @@ h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:10px;mar
   </div>
 </div>
 
+<div class="tab-content" id="tab-metrics">
+  <div class="card">
+    <h2>综合得分明细 (一阶马尔可夫矩阵 + 短期动量)</h2>
+    <table id="metricsTable">
+      <thead>
+        <tr>
+          <th>组合</th>
+          <th>归一化得分</th>
+          <th>排名</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <div style="margin-top:10px;padding:8px;background:#f8fafc;border-radius:8px;font-size:11px;color:var(--text-dim);line-height:1.7">
+      <b style="color:var(--text-2)">极致精准算法说明：</b><br>
+      • **一阶马尔可夫状态转移概率** (权重 50%)：精准捕捉连续开奖之间的演化路径规律<br>
+      • **短期热度动量追踪** (权重 35%)：紧咬最近 15 期高频活跃板块<br>
+      • **均值回归阻尼遗漏** (权重 15%)：防止盲区漏掉冷门<br>
+      • **无观望期机制**：每期必定全功率输出主攻与防守组合
+    </div>
+  </div>
+  <div class="card">
+    <h2>4 个组合得分</h2>
+    <div class="metrics-grid" id="metricBoxes"></div>
+  </div>
+</div>
+
 <div class="tab-content" id="tab-history">
   <div class="card">
-    <h2>🎯 完整预测记录与下期预测表 (每页25期·时间精确到时分秒)</h2>
+    <h2>预测对错记录 (最近 50 期)</h2>
     <div class="summary" id="summaryBox"></div>
-    <div class="table-container" style="margin-top:8px;">
+    <div style="overflow-x:auto;margin-top:10px">
       <table id="historyTable" class="history-table">
         <thead>
           <tr>
-            <th style="width:13%;">期号</th>
-            <th style="width:14%;">开奖时间(时分秒)</th>
-            <th style="width:15%;">开奖号码</th>
-            <th style="width:22%;">组合预测(主|防)</th>
-            <th style="width:20%;">和值预测(高|低)</th>
-            <th style="width:16%;">判定结果</th>
+            <th>期号</th>
+            <th>时间</th>
+            <th>开奖号码</th>
+            <th>预测内容</th>
+            <th>组合</th>
+            <th>形态</th>
+            <th>对错</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -325,30 +281,32 @@ h2 .h2-title .meta-time{color:var(--text-dim);font-weight:400;font-size:10px;mar
     </div>
     <div class="pager" id="historyPager">
       <button class="pager-btn" id="prevPageBtn" onclick="historyPrevPage()">‹ 上一页</button>
-      <div class="pager-info"><span class="cur" id="pagerCur">1</span> / <span id="pagerTotal">1</span></div>
+      <div class="pager-info"><span class="cur" id="pagerCur">1</span> <span class="total">/ <span id="pagerTotal">1</span></span></div>
       <button class="pager-btn" id="nextPageBtn" onclick="historyNextPage()">下一页 ›</button>
     </div>
+    <div class="pattern-stats" id="patternStats"></div>
   </div>
 </div>
 
 <script>
+/* ================================================================
+   配置
+   ================================================================ */
 const APIS = [
   { url: 'https://yu28.top/api/kj?nbr=100', headers: { 'X-Api-Key': 'yu28_6e21b2467d66f604' } },
   { url: 'https://pc28.help/api/kj.json?nbr=100', headers: {} },
 ];
-const WINDOW_SIZE = 45;
+const COMBOS = ['大双', '大单', '小双', '小单'];
+const WINDOW_SIZE = 60;
 const POLL_INTERVAL = 60000;
 const DEFAULT_PERIOD_MS = 210 * 1000;
 const TREND_MAX = 100;
 const HISTORY_REBUILD_COUNT = 50;
-const HISTORY_PER_PAGE = 25; // 严格每页25期
+const HISTORY_PER_PAGE = 25;
 
-const THEORY_SUM_WEIGHTS = {
-  0:1, 1:3, 2:6, 3:10, 4:15, 5:21, 6:28, 7:36, 8:45, 9:55,
-  10:63, 11:69, 12:72, 13:73, 14:73, 15:72, 16:69, 17:63, 18:55, 19:45,
-  20:36, 21:28, 22:21, 23:15, 24:10, 25:6, 26:3, 27:1
-};
-
+/* ================================================================
+   时间
+   ================================================================ */
 function parseDrawTime(dateStr,timeStr){
   if(!dateStr||!timeStr)return NaN;
   const[y,m,d]=dateStr.split('-').map(Number);
@@ -362,7 +320,35 @@ function formatDateTime(drawTime){
   return `${m[1]}/${parseInt(m[2],10)}/${parseInt(m[3],10)} ${m[4]}`;
 }
 
-const DB_NAME='pc28_v32_light',DB_VER=1;let db=null;
+/* ================================================================
+   形态 & 组合样式
+   ================================================================ */
+function detectPattern(a,b,c){
+  if(a===b&&b===c)return '豹子';
+  if(a===b||b===c||a===c)return '对子';
+  const s=[a,b,c].sort((x,y)=>x-y);
+  if(s[1]===s[0]+1 && s[2]===s[1]+1) return '顺子';
+  if(s[0]===0 && s[2]===9 && (s[1]===1 || s[1]===8)) return '顺子';
+  return '杂六';
+}
+function patternClass(p){
+  if(p==='豹子')return 'pt-baozi';
+  if(p==='顺子')return 'pt-shunzi';
+  if(p==='对子')return 'pt-duizi';
+  return 'pt-zaliu';
+}
+function comboClass(combo){
+  if(combo==='大单')return 'combo-dadian';
+  if(combo==='大双')return 'combo-dashuang';
+  if(combo==='小单')return 'combo-xiaodian';
+  if(combo==='小双')return 'combo-xiaoshuang';
+  return '';
+}
+
+/* ================================================================
+   IndexedDB
+   ================================================================ */
+const DB_NAME='pc28_v25_markov',DB_VER=1;let db=null;
 function openDB(){return new Promise((resolve,reject)=>{
   const req=indexedDB.open(DB_NAME,DB_VER);
   req.onupgradeneeded=e=>{const d=e.target.result;
@@ -376,14 +362,20 @@ function dbGetAll(s){return new Promise((res,rej)=>{const r=db.transaction(s,'re
 function dbPut(s,o){return new Promise((res,rej)=>{const r=db.transaction(s,'readwrite').objectStore(s).put(o);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
 function dbPutMany(s,arr){return new Promise((res,rej)=>{const tx=db.transaction(s,'readwrite');const st=tx.objectStore(s);arr.forEach(o=>st.put(o));tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}
 
+/* ================================================================
+   状态
+   ================================================================ */
 let state={
-  lastIssue:'',cycleCount:0,lastHistory:[],
+  top1History:[],lastIssue:'',cycleCount:0,lastHistory:[],
   periodMs:DEFAULT_PERIOD_MS,nextDrawTs:0,lastDrawTs:0,
   pendingTick:false,currentPred:null,
   scratchActive:false,latestDraw:null,historyRebuilt:false,
   historyPage:0,
 };
 
+/* ================================================================
+   API
+   ================================================================ */
 async function fetchDraws(){
   let lastErr=null;
   for(const api of APIS){
@@ -436,6 +428,9 @@ function detectPeriod(draws){
   return gaps[Math.floor(gaps.length/2)];
 }
 
+/* ================================================================
+   倒计时
+   ================================================================ */
 function updateNextDrawTs(latest){if(!latest||!latest.ts)return;state.lastDrawTs=latest.ts;state.nextDrawTs=latest.ts+state.periodMs;}
 function formatCd(ms){if(ms<=0)return'00:00';const t=Math.floor(ms/1000);return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');}
 function formatClock(ts){const dt=new Date(ts+8*3600*1000);return String(dt.getUTCHours()).padStart(2,'0')+':'+String(dt.getUTCMinutes()).padStart(2,'0')+':'+String(dt.getUTCSeconds()).padStart(2,'0');}
@@ -443,7 +438,7 @@ function renderCountdown(){
   const el=document.getElementById('countdown'),sub=document.getElementById('cdSub');
   const bar=document.getElementById('progressBar');
   const startEl=document.getElementById('cdStart'),endEl=document.getElementById('cdEnd');
-  if(!state.nextDrawTs){el.textContent='--:--';sub.textContent='等待数据...';bar.style.width='0%';return;}
+  if(!state.nextDrawTs){el.textContent='--:--';el.className='cd-time';sub.textContent='等待数据...';bar.style.width='0%';return;}
   const total=state.periodMs;
   const remain=state.nextDrawTs-Date.now();
   const elapsed=total-Math.max(0,remain);
@@ -452,69 +447,139 @@ function renderCountdown(){
   bar.style.width=pct.toFixed(1)+'%';
   startEl.textContent=formatClock(state.lastDrawTs);
   endEl.textContent=formatClock(state.nextDrawTs);
-  if(remain<=0){el.className='cd-time urgent';bar.className='progress-bar urgent';sub.textContent='⚠️ 已过预计时间...';if(!state.pendingTick){state.pendingTick=true;tick().finally(()=>{state.pendingTick=false;});}}
+  if(remain<=0){el.className='cd-time urgent';bar.className='progress-bar urgent';sub.textContent='⚠️ 已过预计时间，正在拉取...';if(!state.pendingTick){state.pendingTick=true;tick().finally(()=>{state.pendingTick=false;});}}
   else if(remain<=30000){el.className='cd-time urgent';bar.className='progress-bar urgent';sub.textContent=`约 ${Math.ceil(remain/1000)} 秒后开奖`;}
+  else if(remain<=60000){el.className='cd-time soon';bar.className='progress-bar soon';sub.textContent=`约 ${Math.ceil(remain/1000)} 秒后开奖`;}
   else{el.className='cd-time';bar.className='progress-bar';sub.textContent=`预计 ${formatClock(state.nextDrawTs)} 开奖`;}
 }
 function startCountdownLoop(){setInterval(renderCountdown,200);}
 
-function runMasterAlgorithm(seq, sumSeq) {
-    const M = sumSeq ? sumSeq.length : 0;
-    const sumScores = {};
-    for (let s = 0; s <= 27; s++) {
-        sumScores[s] = (THEORY_SUM_WEIGHTS[s] / 73.0) * 2.0;
+/* ================================================================
+   ★ 极致高精准：一阶马尔可夫矩阵 + 短期动量融合算法 (v25)
+   ================================================================ */
+function runAlgorithm(seq, top1History) {
+    const categories = ['大双', '大单', '小双', '小单'];
+    const N = seq ? seq.length : 0;
+    
+    if (N < 2) {
+        const metrics = {};
+        categories.forEach(c => metrics[c] = { score: 0.25 });
+        return {
+            main: [categories[0], categories[1]],
+            defense: categories[2],
+            ranked: [...categories],
+            top1Raw: categories[0],
+            metrics,
+            fixationTriggered: false,
+            balancedProtection: false
+        };
     }
 
-    if (M > 0) {
-        for (let i = 0; i < M; i++) {
-            const sVal = sumSeq[i];
-            const weight = Math.pow(0.92, M - 1 - i);
-            sumScores[sVal] += weight * 4.0;
-        }
-        const lastSum = sumSeq[M - 1];
-        for (let d = -2; d <= 2; d++) {
-            const targetS = lastSum + d;
-            if (targetS >= 0 && targetS <= 27) {
-                sumScores[targetS] += (3 - Math.abs(d)) * 1.5;
-            }
-        }
-        for (let s = 0; s <= 27; s++) {
-            let lastIdx = -1;
-            for (let i = M - 1; i >= 0; i--) {
-                if (sumSeq[i] === s) { lastIdx = i; break; }
-            }
-            const omission = lastIdx === -1 ? M : (M - 1 - lastIdx);
-            if (omission >= 7) {
-                sumScores[s] += Math.min(omission * 0.4, 4.5);
-            }
+    // 1. 一阶马尔可夫状态转移矩阵计算 (权重 50%)
+    const transition = {};
+    categories.forEach(a => {
+        transition[a] = {};
+        categories.forEach(b => transition[a][b] = 1); // 4组Laplace平滑
+    });
+    let totalTransitions = {};
+    categories.forEach(c => totalTransitions[c] = 4);
+
+    for (let i = 0; i < N - 1; i++) {
+        const curr = seq[i];
+        const next = seq[i+1];
+        if (transition[curr] && transition[curr][next] !== undefined) {
+            transition[curr][next]++;
+            totalTransitions[curr]++;
         }
     }
 
-    const rankedSums = [];
-    for (let s = 0; s <= 27; s++) rankedSums.push({ sum: s, score: sumScores[s] });
-    rankedSums.sort((a, b) => b.score - a.score);
-
-    const highSum = [rankedSums[0].sum, rankedSums[1].sum];
-    const lowSum = [rankedSums[2].sum, rankedSums[3].sum, rankedSums[4].sum];
-
-    const comboScores = { '大双': 0, '大单': 0, '小双': 0, '小单': 0 };
-    rankedSums.forEach(item => {
-        const s = item.sum;
-        const size = s >= 14 ? '大' : '小';
-        const parity = s % 2 === 1 ? '单' : '双';
-        comboScores[size + parity] += item.score;
+    const lastItem = seq[N - 1];
+    const markovScore = {};
+    categories.forEach(c => {
+        markovScore[c] = transition[lastItem] && totalTransitions[lastItem] ? 
+            (transition[lastItem][c] / totalTransitions[lastItem]) : 0.25;
     });
 
-    const rankedCombos = Object.keys(comboScores).sort((a, b) => comboScores[b] - comboScores[a]);
-    const main = [rankedCombos[0], rankedCombos[1]];
-    const defense = rankedCombos[2];
+    // 2. 短期动量权重 (最近 15 期，权重 35%)
+    const shortWindow = seq.slice(-15);
+    const shortCounts = {};
+    categories.forEach(c => shortCounts[c] = 0.1);
+    shortWindow.forEach(item => {
+        if (shortCounts[item] !== undefined) shortCounts[item]++;
+    });
+    const shortTotal = shortWindow.length + 0.4;
+    const momentumScore = {};
+    categories.forEach(c => {
+        momentumScore[c] = shortCounts[c] / shortTotal;
+    });
 
-    return { main, defense, highSum, lowSum };
+    // 3. 均值回归阻尼遗漏值 (权重 15%)
+    const omissionCounts = {};
+    categories.forEach(c => {
+        let lastIdx = -1;
+        for (let i = N - 1; i >= 0; i--) {
+            if (seq[i] === c) {
+                lastIdx = i;
+                break;
+            }
+        }
+        omissionCounts[c] = lastIdx === -1 ? N : (N - 1 - lastIdx);
+    });
+    const maxOm = Math.max(...Object.values(omissionCounts)) + 1e-8;
+    const reversionScore = {};
+    categories.forEach(c => {
+        reversionScore[c] = Math.min(omissionCounts[c] / maxOm, 1.0);
+    });
+
+    // 4. 黄金比例融合：50% 马尔可夫转移 + 35% 短期动量 + 15% 均值回归
+    const scoreRaw = {};
+    categories.forEach(c => {
+        scoreRaw[c] = 0.50 * markovScore[c] + 0.35 * momentumScore[c] + 0.15 * reversionScore[c];
+    });
+
+    // 5. 低温归一化缩放 (sigma = 2.0)，确保梯度平稳
+    const sigmaTemp = 2.0;
+    const expScores = {};
+    let expSum = 0;
+    categories.forEach(c => {
+        const val = Math.exp(sigmaTemp * scoreRaw[c]);
+        expScores[c] = val;
+        expSum += val;
+    });
+
+    const finalScores = {};
+    categories.forEach(c => {
+        finalScores[c] = expSum > 0 ? (expScores[c] / expSum) : 0.25;
+    });
+
+    // 6. 结构输出(无观望期，直接锁定前 2 名为主攻，第 3 名为防守)
+    const ranked = [...categories].sort((a, b) => finalScores[b] - finalScores[a]);
+    const top1Raw = ranked[0];
+    const main = [ranked[0], ranked[1]];
+    const defense = ranked[2];
+
+    const metrics = {};
+    categories.forEach(c => {
+        metrics[c] = { score: Number(finalScores[c].toFixed(4)) };
+    });
+
+    return {
+        main,
+        defense,
+        ranked,
+        top1Raw,
+        metrics,
+        fixationTriggered: false,
+        balancedProtection: false
+    };
 }
 
+/* ================================================================
+   历史重建
+   ================================================================ */
 async function rebuildHistoryFromDraws(){
   const allDraws = await dbGetAll('draws');
-  const MIN_WINDOW = 10;
+  const MIN_WINDOW = 15;
   const n = allDraws.length;
   if (n < MIN_WINDOW + 1) return 0;
 
@@ -524,6 +589,8 @@ async function rebuildHistoryFromDraws(){
 
   const maxRebuild = Math.min(HISTORY_REBUILD_COUNT, n - MIN_WINDOW);
   const startK = n - maxRebuild;
+
+  const localTop1 = [];
 
   const newPreds = [];
   for (let k = startK; k < n; k++) {
@@ -535,25 +602,24 @@ async function rebuildHistoryFromDraws(){
     if (windowDraws.length < MIN_WINDOW) continue;
 
     const seq = windowDraws.map(d => d.combo);
-    const sumSeq = windowDraws.map(d => d.sum_val);
-    const pred = runMasterAlgorithm(seq, sumSeq);
+    const pred = runAlgorithm(seq, localTop1);
     if (!pred) continue;
 
-    const actualDraw = asc[k];
-    const actualCombo = actualDraw.combo;
-    const actualSum = actualDraw.sum_val;
+    localTop1.push(pred.top1Raw);
+    if (localTop1.length > 20) localTop1.shift();
 
-    const mainHit = pred.main.includes(actualCombo) ? 1 : 0;
-    const defHit = (mainHit === 0 && pred.defense === actualCombo) ? 1 : 0;
-    const sumHit = pred.highSum.includes(actualSum) || pred.lowSum.includes(actualSum) ? 1 : 0;
+    const actual = asc[k].combo;
+    const mainHit = pred.main.includes(actual) ? 1 : 0;
+    const defHit = (mainHit === 0 && pred.defense === actual) ? 1 : 0;
 
     newPreds.push({
       key: predIssue, issue: predIssue,
       predict_time: asc[k - 1].draw_time,
       main: pred.main, defense: pred.defense,
-      highSum: pred.highSum, lowSum: pred.lowSum,
-      actual: actualCombo, actualSum: actualSum,
-      main_hit: mainHit, def_hit: defHit, sum_hit: sumHit,
+      ranked: pred.ranked,
+      metrics: pred.metrics,
+      actual: actual,
+      main_hit: mainHit, def_hit: defHit,
       historical: true,
     });
   }
@@ -561,22 +627,31 @@ async function rebuildHistoryFromDraws(){
   return newPreds.length;
 }
 
+/* ================================================================
+   走势图
+   ================================================================ */
 async function drawTrend(){
   const tbody = document.getElementById('trendBody');
   const allDraws = await dbGetAll('draws');
-  if (!allDraws.length) { tbody.innerHTML = '<tr><td colspan="10">暂无数据...</td></tr>'; return; }
+  if (!allDraws.length) {
+    tbody.innerHTML = '<tr><td colspan="10" class="trend-empty">暂无数据...</td></tr>';
+    document.getElementById('trendSummary').innerHTML = '';
+    return;
+  }
   const draws = allDraws.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0)).slice(-TREND_MAX).reverse();
   const html = draws.map((d, i) => {
     const isLatest = i === 0;
-    if (isLatest && state.scratchActive) {
-      return `<tr class="latest">
+    const hideLatest = isLatest && state.scratchActive;
+    if (hideLatest) {
+      return `<tr class="latest hidden">
         <td class="issue">${d.issue}</td>
-        <td colspan="9" style="color:var(--text-dim);font-style:italic">? ? ? 刮开查看</td>
+        <td colspan="9"><span class="hidden-q">? ? ? 刮开查看</span></td>
       </tr>`;
     }
     const isBig = d.sum_val >= 14;
     const isOdd = d.sum_val % 2 === 1;
     const combo = d.combo || ((isBig ? '大' : '小') + (isOdd ? '单' : '双'));
+    const comboCls = (combo === '大双' || combo === '小双') ? 'tag-combo-big' : 'tag-combo-small';
     return `<tr class="${isLatest ? 'latest' : ''}">
       <td class="issue">${d.issue}</td>
       <td class="val">${String(d.sum_val).padStart(2, '0')}</td>
@@ -584,28 +659,33 @@ async function drawTrend(){
       <td>${!isBig ? '<span class="tag tag-small">小</span>' : ''}</td>
       <td>${isOdd ? '<span class="tag tag-odd">单</span>' : ''}</td>
       <td>${!isOdd ? '<span class="tag tag-even">双</span>' : ''}</td>
-      <td>${combo === '大单' ? '<span class="tag tag-small">大单</span>' : ''}</td>
-      <td>${combo === '大双' ? '<span class="tag tag-big">大双</span>' : ''}</td>
-      <td>${combo === '小单' ? '<span class="tag tag-small">小单</span>' : ''}</td>
-      <td>${combo === '小双' ? '<span class="tag tag-big">小双</span>' : ''}</td>
+      <td>${combo === '大单' ? `<span class="tag ${comboCls}">大单</span>` : ''}</td>
+      <td>${combo === '大双' ? `<span class="tag ${comboCls}">大双</span>` : ''}</td>
+      <td>${combo === '小单' ? `<span class="tag ${comboCls}">小单</span>` : ''}</td>
+      <td>${combo === '小双' ? `<span class="tag ${comboCls}">小双</span>` : ''}</td>
     </tr>`;
   }).join('');
   tbody.innerHTML = html;
 
-  const visible = state.scratchActive ? draws.slice(1) : draws;
+  const visibleDraws = state.scratchActive ? draws.slice(1) : draws;
   const counts = {'大单':0,'大双':0,'小单':0,'小双':0};
-  visible.forEach(d => { if (counts[d.combo] != null) counts[d.combo]++; });
-  const total = visible.length || 1;
+  visibleDraws.forEach(d => { if (counts[d.combo] != null) counts[d.combo]++; });
+  const total = visibleDraws.length || 1;
+  const bigCount = visibleDraws.filter(d => d.sum_val >= 14).length;
+  const oddCount = visibleDraws.filter(d => d.sum_val % 2 === 1).length;
   document.getElementById('trendSummary').innerHTML = `
-    <div><div class="sv" style="color:#dc2626">${counts['大单']}</div><div class="sl">大单</div></div>
-    <div><div class="sv" style="color:#d97706">${counts['大双']}</div><div class="sl">大双</div></div>
-    <div><div class="sv" style="color:#2563eb">${counts['小单']}</div><div class="sl">小单</div></div>
-    <div><div class="sv" style="color:#0891b2">${counts['小双']}</div><div class="sl">小双</div></div>
-    <div><div class="sv">${(visible.filter(d=>d.sum_val>=14).length*100/total).toFixed(0)}%</div><div class="sl">大占比</div></div>
-    <div><div class="sv">${(visible.filter(d=>d.sum_val%2===1).length*100/total).toFixed(0)}%</div><div class="sl">单占比</div></div>
+    <div><div class="sv" style="color:#b91c1c">${counts['大单']}</div><div class="sl">大单</div></div>
+    <div><div class="sv" style="color:#c2410c">${counts['大双']}</div><div class="sl">大双</div></div>
+    <div><div class="sv" style="color:#1d4ed8">${counts['小单']}</div><div class="sl">小单</div></div>
+    <div><div class="sv" style="color:#0e7490">${counts['小双']}</div><div class="sl">小双</div></div>
+    <div><div class="sv">${(bigCount * 100 / total).toFixed(0)}%</div><div class="sl">大占比</div></div>
+    <div><div class="sv">${(oddCount * 100 / total).toFixed(0)}%</div><div class="sl">单占比</div></div>
   `;
 }
 
+/* ================================================================
+   刮奖
+   ================================================================ */
 function initScratch(){
   const canvas = document.getElementById('scratchCanvas');
   const wrap = document.getElementById('scratchWrap');
@@ -617,16 +697,22 @@ function initScratch(){
   const ctx = canvas.getContext('2d');
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.scale(dpr, dpr);
-  ctx.fillStyle = '#334155'; ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = '#fff'; ctx.font = 'bold 14px sans-serif'; ctx.textAlign = 'center';
-  ctx.fillText('👆 手指滑动刮开查看最新开奖', w / 2, h / 2 + 5);
+  const grad = ctx.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#cbd5e1');
+  grad.addColorStop(0.5, '#94a3b8');
+  grad.addColorStop(1, '#cbd5e1');
+  ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+  ctx.fillStyle = '#fff'; ctx.font = 'bold 15px sans-serif'; ctx.textAlign = 'center';
+  ctx.fillText('👆 手指滑动刮开', w / 2, h / 2 - 4);
+  ctx.font = '11px sans-serif';
+  ctx.fillText('揭晓最新一期开奖', w / 2, h / 2 + 14);
   state.scratchActive = true;
   updateScratchBtn();
   drawTrend();
   let drawing = false;
   const erase = (x, y) => {
     ctx.globalCompositeOperation = 'destination-out';
-    ctx.beginPath(); ctx.arc(x, y, 20, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, y, 22, 0, Math.PI * 2); ctx.fill();
     checkReveal();
   };
   const getPos = e => {
@@ -636,7 +722,7 @@ function initScratch(){
   };
   canvas.onmousedown = canvas.ontouchstart = e => { e.preventDefault(); drawing = true; const {x,y} = getPos(e); erase(x,y); };
   canvas.onmousemove = canvas.ontouchmove = e => { if (!drawing) return; e.preventDefault(); const {x,y} = getPos(e); erase(x,y); };
-  canvas.onmouseup = canvas.ontouchend = canvas.onmouseleave = () => { drawing = false; };
+  canvas.onmouseup = canvas.ontouchend = canvas.onmouseleave = canvas.ontouchcancel = () => { drawing = false; };
 }
 function checkReveal(){
   const canvas = document.getElementById('scratchCanvas');
@@ -659,6 +745,9 @@ function revealAll(){
 function toggleScratch(){ if (state.scratchActive) revealAll(); else initScratch(); }
 function updateScratchBtn(){ document.getElementById('scratchBtn').textContent = state.scratchActive ? '👁 揭晓' : '🎯 刮奖'; }
 
+/* ================================================================
+   计算下一期期号
+   ================================================================ */
 function getNextIssue(){
   const latest = state.latestDraw;
   if(!latest || !latest.issue) return '?';
@@ -666,26 +755,45 @@ function getNextIssue(){
   return isNaN(n) ? latest.issue : String(n + 1);
 }
 
+/* ================================================================
+   复制
+   ================================================================ */
 function copyPrediction(){
-  if (!state.currentPred) return;
-  const p = state.currentPred;
+  if (!state.currentPred) { setStatus('暂无预测可复制', 'warn'); return; }
+  const main = state.currentPred.main.join('·');
+  const def = state.currentPred.defense || '无';
   const nextIssue = getNextIssue();
-  const text = `${nextIssue}期预测|主攻:${p.main.join('·')} 防守:${p.defense}|高置信和值:${p.highSum.join(',')}|低置信和值:${p.lowSum.join(',')}`;
+  const text = `${nextIssue}期主攻：${main} | 防守：${def}`;
+  const onSuccess = () => {
+    const btn = document.getElementById('copyBtn');
+    const orig = btn.textContent;
+    btn.textContent = '✅ 已复制';
+    btn.style.animation = 'copied .4s';
+    setStatus('已复制：' + text, 'ok');
+    setTimeout(() => { btn.textContent = orig; btn.style.animation = ''; }, 1500);
+  };
+  const onFail = (e) => { setStatus('复制失败，请长按选择', 'warn'); };
   if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById('copyBtn');
-      const orig = btn.textContent;
-      btn.textContent = '✅ 已复制';
-      setTimeout(() => btn.textContent = orig, 1500);
-    });
-  }
+    navigator.clipboard.writeText(text).then(onSuccess).catch(() => { fallbackCopy(text) ? onSuccess() : onFail(); });
+  } else { fallbackCopy(text) ? onSuccess() : onFail(); }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position = 'fixed'; ta.style.left = '-9999px'; ta.style.top = '0';
+  ta.setAttribute('readonly', '');
+  document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+  document.body.removeChild(ta); return ok;
 }
 
+/* ================================================================
+   主循环
+   ================================================================ */
 async function tick(){
   try {
-    setStatus('同步数据...', 'warn');
+    setStatus('拉取数据...', 'warn');
     const draws = await fetchDraws();
-    if (!draws.length) return;
+    if (!draws.length) { setStatus('接口无数据', 'warn'); return; }
 
     await dbPutMany('draws', draws);
     state.periodMs = detectPeriod(draws);
@@ -697,83 +805,110 @@ async function tick(){
 
     if (!state.historyRebuilt) {
       state.historyRebuilt = true;
-      await rebuildHistoryFromDraws();
+      setStatus('重建历史记录...', 'warn');
+      const added = await rebuildHistoryFromDraws();
+      if (added > 0) setStatus(`重建历史 ${added} 期`, 'ok');
     }
 
     await drawTrend();
 
-    if (latest.issue === state.lastIssue) { setStatus(`实时同步中(${latest.issue})`, 'ok'); return; }
+    if (latest.issue === state.lastIssue) { setStatus(`无新期(${latest.issue})`, 'ok'); return; }
     state.lastIssue = latest.issue;
     state.cycleCount++;
 
     const all = await dbGetAll('draws');
     all.sort((a, b) => (a.ts || 0) - (b.ts || 0));
-    const pred = runMasterAlgorithm(all.map(d => d.combo), all.map(d => d.sum_val));
-    if (!pred) return;
+    const seqAll = all.map(d => d.combo);
+
+    const recent = seqAll.slice(-WINDOW_SIZE);
+    const pred = runAlgorithm(recent, state.top1History);
+    if (!pred) { setStatus('分析失败', 'bad'); return; }
     state.currentPred = pred;
     renderPrediction(pred);
+
+    state.top1History.push(pred.top1Raw);
+    if (state.top1History.length > 20) state.top1History.shift();
 
     await dbPut('preds', {
       key: latest.issue, issue: latest.issue,
       predict_time: latest.draw_time,
       main: pred.main, defense: pred.defense,
-      highSum: pred.highSum, lowSum: pred.lowSum,
-      actual: null, actualSum: null,
-      main_hit: null, def_hit: null, sum_hit: null, historical: false,
+      ranked: pred.ranked, metrics: pred.metrics,
+      actual: null, main_hit: null, def_hit: null, historical: false,
     });
 
-    await backfill(all, draws);
+    await backfill(seqAll, draws);
     await refreshHistory();
-    setStatus(`引擎运行中 (第${state.cycleCount}轮)`, 'ok');
+
+    setStatus(`完成(第 ${state.cycleCount} 轮)`, 'ok');
   } catch (e) {
-    setStatus('错误：' + e.message, 'bad');
+    console.error(e);
+    setStatus('出错：' + e.message, 'bad');
   }
 }
 
-async function backfill(allDraws, draws){
+async function backfill(seqAll, draws){
   const allPreds = await dbGetAll('preds');
   const predMap = {}; allPreds.forEach(p => predMap[p.issue] = p);
-  const asc = allDraws.slice().sort((a, b) => a.ts - b.ts);
-  const nextMap = {};
-  for (let i = 0; i < asc.length - 1; i++) nextMap[asc[i].issue] = asc[i + 1];
-
+  const asc = draws.slice().sort((a, b) => a.ts - b.ts);
+  const nextCombo = {};
+  for (let i = 0; i < asc.length - 1; i++) nextCombo[asc[i].issue] = asc[i + 1].combo;
   for (const [issue, p] of Object.entries(predMap)) {
     if (p.actual) continue;
-    const nxt = nextMap[issue];
-    if (!nxt) continue;
-    p.actual = nxt.combo;
-    p.actualSum = nxt.sum_val;
-    p.main_hit = p.main.includes(nxt.combo) ? 1 : 0;
-    p.def_hit = (p.main_hit === 0 && p.defense === nxt.combo) ? 1 : 0;
-    p.sum_hit = (p.highSum && p.highSum.includes(nxt.sum_val)) || (p.lowSum && p.lowSum.includes(nxt.sum_val)) ? 1 : 0;
+    const actual = nextCombo[issue]; if (!actual) continue;
+    p.actual = actual;
+    const main = typeof p.main === 'string' ? p.main.split(',') : p.main;
+    p.main_hit = main.includes(actual) ? 1 : 0;
+    p.def_hit = (p.main_hit === 0 && p.defense === actual) ? 1 : 0;
     await dbPut('preds', p);
   }
 }
 
+/* ================================================================
+   对错表
+   ================================================================ */
 async function refreshHistory(){
   const preds = await dbGetAll('preds');
   const allDraws = await dbGetAll('draws');
+
   const ascDraws = allDraws.slice().sort((a, b) => (a.ts || 0) - (b.ts || 0));
   const issueToNext = {};
   for (let i = 0; i < ascDraws.length - 1; i++) issueToNext[ascDraws[i].issue] = ascDraws[i + 1];
 
   const filled = preds.filter(p => p.actual)
-    .sort((a, b) => (b.issue || '').localeCompare(a.issue || ''));
+    .sort((a, b) => (b.issue || '').localeCompare(a.issue || ''))
+    .slice(0, HISTORY_REBUILD_COUNT);
 
   state.lastHistory = filled;
+
   const total = filled.length;
   const mainHits = filled.filter(p => p.main_hit).length;
   const defHits = filled.filter(p => p.def_hit).length;
-  const sumHits = filled.filter(p => p.sum_hit).length;
   const empty = total - mainHits - defHits;
-
   document.getElementById('summaryBox').innerHTML = `
-    <div><div class="sv">${total}</div><div class="sl">总期</div></div>
-    <div><div class="sv" style="color:#059669">${mainHits}</div><div class="sl">主攻中</div></div>
-    <div><div class="sv" style="color:#d97706">${defHits}</div><div class="sl">防守中</div></div>
-    <div><div class="sv" style="color:#2563eb">${sumHits}</div><div class="sl">和值中</div></div>
+    <div><div class="sv">${total}</div><div class="sl">总期数</div></div>
+    <div><div class="sv" style="color:#059669">${mainHits}</div><div class="sl">主推命中</div></div>
+    <div><div class="sv" style="color:#d97706">${defHits}</div><div class="sl">防守命中</div></div>
     <div><div class="sv" style="color:#dc2626">${empty}</div><div class="sl">全空</div></div>
-    <div><div class="sv">${total ? (mainHits * 100 / total).toFixed(1) : 0}%</div><div class="sl">主攻率</div></div>
+    <div><div class="sv">${total ? (mainHits * 100 / total).toFixed(1) : 0}%</div><div class="sl">主推率</div></div>
+  `;
+
+  const patternCounts = {豹子:0, 顺子:0, 对子:0, 杂六:0};
+  let validCount = 0;
+  for (const p of filled) {
+    const nextDraw = issueToNext[p.issue];
+    if (nextDraw) {
+      const pat = detectPattern(nextDraw.num_a, nextDraw.num_b, nextDraw.num_c);
+      patternCounts[pat]++;
+      validCount++;
+    }
+  }
+  const vc = validCount || 1;
+  document.getElementById('patternStats').innerHTML = `
+    <div class="pattern-stat-item"><span class="pattern-tag pt-baozi">豹子</span><span class="pattern-stat-val">${patternCounts.豹子}</span><span class="pattern-stat-lbl" style="color:#6d28d9">${(patternCounts.豹子 * 100 / vc).toFixed(0)}%</span></div>
+    <div class="pattern-stat-item"><span class="pattern-tag pt-shunzi">顺子</span><span class="pattern-stat-val">${patternCounts.顺子}</span><span class="pattern-stat-lbl" style="color:#0e7490">${(patternCounts.顺子 * 100 / vc).toFixed(0)}%</span></div>
+    <div class="pattern-stat-item"><span class="pattern-tag pt-duizi">对子</span><span class="pattern-stat-val">${patternCounts.对子}</span><span class="pattern-stat-lbl" style="color:#b45309">${(patternCounts.对子 * 100 / vc).toFixed(0)}%</span></div>
+    <div class="pattern-stat-item"><span class="pattern-tag pt-zaliu">杂六</span><span class="pattern-stat-val">${patternCounts.杂六}</span><span class="pattern-stat-lbl" style="color:#64748b">${(patternCounts.杂六 * 100 / vc).toFixed(0)}%</span></div>
   `;
 
   renderHistoryPage(filled, issueToNext);
@@ -790,56 +925,40 @@ function renderHistoryPage(filled, issueToNext){
 
   const tbody = document.querySelector('#historyTable tbody');
   tbody.innerHTML = '';
-
-  // 第一行实时插入下一期的完整预测
-  if (state.historyPage === 0 && state.currentPred) {
-    const nextIssue = getNextIssue();
-    const p = state.currentPred;
-    const pendingTr = document.createElement('tr');
-    pendingTr.className = 'pending-row';
-    pendingTr.innerHTML = `
-      <td class="issue-cell">${nextIssue}期(预)</td>
-      <td class="time-cell">即将开奖</td>
-      <td>等待开奖</td>
-      <td><span style="color:#2563eb">${p.main.join('·')}</span><span style="color:var(--text-dim);font-size:8px">(${p.defense})</span></td>
-      <td><span style="color:#059669">[${p.highSum.join(',')}]</span><span style="color:#d97706;font-size:8px">[${p.lowSum.join(',')}]</span></td>
-      <td><span style="color:#2563eb">等待...</span></td>
-    `;
-    tbody.appendChild(pendingTr);
-  }
-
-  if (!pageItems.length && !state.currentPred) {
-    tbody.innerHTML = '<tr><td colspan="6">暂无记录</td></tr>';
+  if (pageItems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="padding:20px;color:var(--text-dim);text-align:center">暂无数据</td></tr>';
   } else {
     for (const p of pageItems) {
       const tr = document.createElement('tr');
-      let mark = p.main_hit ? '<span class="hit">主攻🀄</span>' : (p.def_hit ? '<span class="hit">防守🀄</span>' : '<span class="miss">全空🌸</span>');
-      if (p.sum_hit) mark += '<span style="color:#2563eb;font-size:8px">和🀄</span>';
+      let mark, cls;
+      if (p.main_hit) { mark = '主推🀄✅'; cls = 'hit'; }
+      else if (p.def_hit) { mark = '防守🀄✅'; cls = 'hit'; }
+      else { mark = '🌸🈳'; cls = 'miss'; }
 
       const nextDraw = issueToNext[p.issue];
-      let issueShow = p.issue, timeShow = '', numsShow = '?', combo = '-';
+      let issueShow = '?', timeShow = '', numsShow = '?', pattern = '-', combo = '-', comboCls = '';
       if (nextDraw) {
         issueShow = nextDraw.issue;
-        // 提取精确到时分秒的时间 (HH:MM:SS)
         const m = (nextDraw.draw_time || '').match(/(\d{2}:\d{2}:\d{2})/);
-        timeShow = m ? m[1] : (nextDraw.draw_time || '').slice(-8);
+        timeShow = m ? m[1] : '';
         numsShow = `${nextDraw.num_a}+${nextDraw.num_b}+${nextDraw.num_c}=${nextDraw.sum_val}`;
         combo = nextDraw.combo;
+        comboCls = comboClass(combo);
+        pattern = detectPattern(nextDraw.num_a, nextDraw.num_b, nextDraw.num_c);
       }
 
-      const mainStr = Array.isArray(p.main) ? p.main.join('·') : '';
-      const defStr = p.defense ? `(${p.defense})` : '';
-      const highStr = p.highSum ? p.highSum.join(',') : '';
-      const lowStr = p.lowSum ? p.lowSum.join(',') : '';
+      const mainStr = Array.isArray(p.main) ? p.main.join('·') : (p.main || '');
+      const defStr = p.defense ? `(防:${p.defense})` : '';
+      const predContent = `<span style="font-size:10px;color:var(--text-2);font-weight:700;">${mainStr} ${defStr}</span>`;
 
-      // 完美呈现：精确到时分秒的时间、完整组合、和值预测
       tr.innerHTML = `
         <td class="issue-cell">${issueShow}</td>
         <td class="time-cell">${timeShow}</td>
         <td class="nums-cell">${numsShow}</td>
-        <td><span style="color:#2563eb">${mainStr}</span><span style="color:var(--text-dim);font-size:8px">${defStr}</span></td>
-        <td><span style="color:#059669">[${highStr}]</span><span style="color:#d97706;font-size:8px">[${lowStr}]</span></td>
-        <td>${mark}</td>
+        <td>${predContent}</td>
+        <td><span class="combo-tag ${comboCls}">${combo}</span></td>
+        <td><span class="pattern-tag ${patternClass(pattern)}">${pattern}</span></td>
+        <td class="${cls}">${mark}</td>
       `;
       tbody.appendChild(tr);
     }
@@ -856,6 +975,9 @@ function historyNextPage(){
   if (state.historyPage < totalPages - 1) { state.historyPage++; refreshHistory(); }
 }
 
+/* ================================================================
+   UI
+   ================================================================ */
 function setStatus(msg, type){
   const el = document.getElementById('statusText');
   el.textContent = msg;
@@ -863,7 +985,8 @@ function setStatus(msg, type){
 }
 function setLatest(d){
   document.getElementById('latestIssue').textContent = d.issue;
-  document.getElementById('latestHeader').innerHTML = `<b>第${d.issue}期</b><span class="meta-time">${formatDateTime(d.draw_time)}</span>`;
+  document.getElementById('latestHeader').innerHTML =
+    `<b>第${d.issue}期</b><span class="meta-time">${formatDateTime(d.draw_time)}</span>`;
   document.getElementById('lrA').textContent = d.num_a;
   document.getElementById('lrB').textContent = d.num_b;
   document.getElementById('lrC').textContent = d.num_c;
@@ -878,11 +1001,46 @@ function setLatest(d){
 
 function renderPrediction(pred){
   const nextIssue = getNextIssue();
-  document.getElementById('predMain').textContent = `${nextIssue}期主攻: ${pred.main.join(' · ')}`;
-  document.getElementById('predDef').textContent = `防守: ${pred.defense}`;
-  document.getElementById('predHighSum').textContent = pred.highSum.join(' , ');
-  document.getElementById('predLowSum').textContent = pred.lowSum.join(' , ');
-  refreshHistory();
+  document.getElementById('predLine').innerHTML =
+    `<span class="issue-tag">${nextIssue}期</span>` +
+    `<span class="item"><span class="lbl">主攻：</span><span class="main-val">${pred.main.join('·')}</span></span>` +
+    `<span class="pipe">|</span>` +
+    `<span class="item"><span class="lbl">防守：</span><span class="def-val">${pred.defense || '无'}</span></span>`;
+
+  const fixEl = document.getElementById('fixationMsg');
+  fixEl.textContent = '🚀 马尔可夫全功率实时输出中';
+  fixEl.className = '';
+
+  const tbody = document.querySelector('#metricsTable tbody');
+  tbody.innerHTML = '';
+  pred.ranked.forEach((c, idx) => {
+    const m = pred.metrics[c];
+    const tr = document.createElement('tr');
+    if (idx < 2) tr.style.background = '#ecfdf5';
+    else if (idx === 2) tr.style.background = '#fffbeb';
+    const score = (m && m.score !== undefined) ? m.score.toFixed(4) : '-';
+    tr.innerHTML = `
+      <td><b>${c}</b></td>
+      <td class="num" style="font-weight:800;color:#4f46e5">${score}</td>
+      <td>[${idx + 1}]</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  const boxes = document.getElementById('metricBoxes');
+  boxes.innerHTML = '';
+  pred.ranked.forEach((c, idx) => {
+    const m = pred.metrics[c];
+    const div = document.createElement('div');
+    div.className = 'metric-box' + (idx === 0 ? ' rank1' : idx === 1 ? ' rank2' : '');
+    const tag = idx === 0 ? '主推1' : idx === 1 ? '主推2' : idx === 2 ? '防守' : '候选';
+    const scorePct = (m && m.score !== undefined) ? (m.score * 100).toFixed(1) + '%' : '-';
+    div.innerHTML = `
+      <div class="mv">${scorePct}</div>
+      <div class="ml">${c} · ${tag}</div>
+    `;
+    boxes.appendChild(div);
+  });
 }
 
 function switchTab(name){
@@ -891,6 +1049,9 @@ function switchTab(name){
   if (name === 'trend') setTimeout(drawTrend, 50);
 }
 
+/* ================================================================
+   启动
+   ================================================================ */
 async function boot(){
   await openDB();
   updateScratchBtn();
@@ -898,8 +1059,13 @@ async function boot(){
   await tick();
   startCountdownLoop();
   setInterval(tick, POLL_INTERVAL);
-  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') tick(); });
-  window.addEventListener('resize', () => { drawTrend(); if (state.scratchActive) initScratch(); });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') tick();
+  });
+  window.addEventListener('resize', () => {
+    drawTrend();
+    if (state.scratchActive) initScratch();
+  });
 }
 boot();
 </script>
